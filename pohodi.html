@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pohodi – Pohodnik.si</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+  <style>
+    body {
+      padding-top: 70px;
+      background-color: #f4f8f4;
+    }
+
+    .navbar-brand img {
+      height: 40px;
+    }
+
+    .section-title {
+      margin-top: 40px;
+      margin-bottom: 20px;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .card {
+      border: none;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s;
+    }
+
+    .card:hover {
+      transform: scale(1.02);
+    }
+
+    footer {
+      background-color: #2e7d32;
+      color: white;
+      text-align: center;
+      padding: 15px 0;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-success fixed-top shadow">
+  <div class="container">
+    <a class="navbar-brand" href="index.html">
+      <img src="slike/logo.png" alt="Pohodnik.si Logo">
+      Pohodnik.si
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="index.html">Domov</a></li>
+        <li class="nav-item"><a class="nav-link active" href="pohodi.html">Pohodi</a></li>
+        <li class="nav-item"><a class="nav-link" href="drustva.html">Društva</a></li>
+        <li class="nav-item"><a class="nav-link" href="prijava.html">Prijavi se</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+  <h2 class="section-title">Pregled pohodov</h2>
+    <div class="row mb-4" data-aos="fade-down">
+        <div class="col-md-4 mb-2">
+            <input type="text" id="searchInput" class="form-control" placeholder="Išči pohode po imenu...">
+        </div>
+        <div class="col-md-2 mb-2">
+            <select id="tezavnostFilter" class="form-select">
+                <option value="">Vse težavnosti</option>
+                <option value="1">1/5</option>
+                <option value="2">2/5</option>
+                <option value="3">3/5</option>
+                <option value="4">4/5</option>
+                <option value="5">5/5</option>
+            </select>
+        </div>
+        <div class="col-md-2 mb-2">
+            <select id="lokacijaFilter" class="form-select">
+                <option value="">Vse regije</option>
+                <option value="gorenjska">Gorenjska</option>
+                <option value="primorska">Primorska</option>
+                <option value="stajerska">Štajerska</option>
+            </select>
+        </div>
+        <div class="col-md-2 mb-2">
+            <select id="datumFilter" class="form-select">
+                <option value="">Kadarkoli</option>
+                <option value="16.5.">Jutri (16.5.)</option>
+                <option value="17.5.">17.5.</option>
+                <option value="18.5.">18.5.</option>
+                <option value="19.5.">19.5.</option>
+            </select>
+        </div>
+        <div class="col-md-2 mb-2">
+            <button class="btn btn-success"> Išči </button>
+        </div>
+  </div>
+
+  <div class="row">
+        <div class="col-md-4 mb-4" data-aos="fade-up">
+            <div class="card h-100">
+                <img src="slike/index-1.jpg" class="card-img-top" alt="Gorski pohod">
+                <div class="card-body">
+                    <h5 class="card-title" id="naslovPohod2">Vzpon na Stol</h5>
+                    <p class="card-text" id="opisPohod1">Eden najlepših razgledov v Karavankah. Primerno za izkušene pohodnike.</p>
+                    <p id="organizatorPohod1">Organizator: Društvo Trail</p>
+                    <p id="tezavnostPohod1">Težavnost: 2/5</p>
+                    <p id="datumPohod1">Datum: 18.5.</p>
+                    <a href="#" class="btn btn-success">Več informacij</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4" data-aos="fade-up">
+            <div class="card h-100">
+                <img src="slike/index-1.jpg" class="card-img-top" alt="Gorski pohod">
+                <div class="card-body">
+                    <h5 class="card-title" id="naslovPohod2">Vzpon na Stol</h5>
+                    <p class="card-text" id="opisPohod1">Eden najlepših razgledov v Karavankah. Primerno za izkušene pohodnike.</p>
+                    <p id="organizatorPohod1">Organizator: Društvo Trail</p>
+                    <p id="tezavnostPohod1">Težavnost: 2/5</p>
+                    <p id="datumPohod1">Datum: 18.5.</p>
+                    <a href="#" class="btn btn-success">Več informacij</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4" data-aos="fade-up">
+            <div class="card h-100">
+                <img src="slike/index-1.jpg" class="card-img-top" alt="Gorski pohod">
+                <div class="card-body">
+                    <h5 class="card-title" id="naslovPohod2">Vzpon na Stol</h5>
+                    <p class="card-text" id="opisPohod1">Eden najlepših razgledov v Karavankah. Primerno za izkušene pohodnike.</p>
+                    <p id="organizatorPohod1">Organizator: Društvo Trail</p>
+                    <p id="tezavnostPohod1">Težavnost: 2/5</p>
+                    <p id="datumPohod1">Datum: 18.5.</p>
+                    <a href="#" class="btn btn-success">Več informacij</a>
+                </div>
+            </div>
+        </div>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    &copy; 2025 Pohodnik.si – Skupaj raziskujemo naravo.
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+  AOS.init({
+    duration: 1000,
+    once: true
+  });
+</script>
+
+</body>
+</html>
+
+<!-- TUKAJ JE SKRIPTA KAK BI MOGLO ZGLEDAT ZA SEARCH
+<script>
+  AOS.init({ duration: 1000, once: true });
+
+  // Filter funkcionalnost
+  const searchInput = document.getElementById('searchInput');
+  const difficultyFilter = document.getElementById('difficultyFilter');
+  const regionFilter = document.getElementById('regionFilter');
+  const hikes = document.querySelectorAll('.hike');
+
+  function filterHikes() {
+    const searchTerm = searchInput.value.toLowerCase();
+    const selectedDifficulty = difficultyFilter.value;
+    const selectedRegion = regionFilter.value;
+
+    hikes.forEach(hike => {
+      const title = hike.querySelector('.card-title').textContent.toLowerCase();
+      const difficulty = hike.getAttribute('data-difficulty');
+      const region = hike.getAttribute('data-region');
+
+      const matchesSearch = title.includes(searchTerm);
+      const matchesDifficulty = !selectedDifficulty || difficulty === selectedDifficulty;
+      const matchesRegion = !selectedRegion || region === selectedRegion;
+
+      if (matchesSearch && matchesDifficulty && matchesRegion) {
+        hike.style.display = '';
+      } else {
+        hike.style.display = 'none';
+      }
+    });
+  }
+
+  searchInput.addEventListener('input', filterHikes);
+  difficultyFilter.addEventListener('change', filterHikes);
+  regionFilter.addEventListener('change', filterHikes);
+</script>
+-->
