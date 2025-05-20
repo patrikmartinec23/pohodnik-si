@@ -3,15 +3,23 @@
   "version": "1.0.0",
   "main": "db.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "concurrently \"npm run server\" \"npm run sass:watch\"",
+    "server": "node server.js",
+    "sass:watch": "sass --no-source-map --watch public/scss:public/css",
+    "sass:build": "sass --no-source-map public/scss:public/css"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^6.7.2",
+    "bootstrap": "^5.3.6",
     "express": "^5.1.0",
-    "mysql2": "^3.14.1"
+    "mysql2": "^3.14.1",
+    "sass": "^1.89.0"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
   }
 }

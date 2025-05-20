@@ -209,4 +209,3 @@ SELECT * FROM Pohod;
 
 SELECT * FROM Uporabnik;
 SELECT * FROM pohodniskodrustvo;
-
