@@ -8,177 +8,523 @@
             href="https://unpkg.com/aos@2.3.1/dist/aos.css"
             rel="stylesheet"
         />
+        <link
+            rel="stylesheet"
+            type="text/css"
+            href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css"
+        />
         <link rel="stylesheet" href="../css/fontawesome.css" />
         <link rel="stylesheet" href="../css/bootstrap.css" />
         <link rel="stylesheet" href="../css/styles.css" />
     </head>
     <body>
-        <nav
-            class="navbar navbar-expand-lg navbar-dark bg-success fixed-top shadow"
-        >
+        <!-- Navigation -->
+        <div id="navbar"></div>
+
+        <!-- Header -->
+        <header class="header position-relative">
+            <img
+                src="./images/vertical-decoration-left.png"
+                alt="decor"
+                class="vertical-decoration position-absolute d-none d-md-block"
+            />
             <div class="container">
-                <a class="navbar-brand" href="#">
-                    <img src="slike/logo.png" alt="Pohodnik.si Logo" />
-                    Pohodnik.si
-                </a>
-                <button
-                    class="navbar-toggler"
-                    type="button"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#navbarNav"
-                >
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto">
-                        <li class="nav-item">
-                            <a class="nav-link active" href="index.html"
-                                ><i class="fas fa-star"></i>Domov</a
+                <div class="row">
+                    <div class="col-md-6 pt-5">
+                        <h1 class="xl-text mt-5">
+                            Prva spletna stran za
+                            <span class="text-primary fw-bold replace-me"
+                                >Pohodnike, Društva, Športnike</span
                             >
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="./pohodi.html">Pohodi</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="drustva.html">Društva</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="prijava.hmtl"
-                                >Prijavi se</a
-                            >
-                        </li>
-                    </ul>
+                        </h1>
+                        <p class="lead">
+                            Razišči organizirane pohode, pridruži se društvom,
+                            poveži se z drugimi pohodniki, nadgradi svoja
+                            doživetja in še mnogo več!
+                        </p>
+                        <a
+                            href=""
+                            class="btn btn-primary text-white fw-bold mt-xl-3 mt-0"
+                            >Poglej pohode</a
+                        >
+                    </div>
                 </div>
             </div>
-        </nav>
+        </header>
 
-        <section class="hero" data-aos="fade-up" data-aos-delay="200">
+        <!-- Partners -->
+        <section class="partners py-4 overflow-hidden">
             <div class="container">
-                <h1>Dobrodošli na Pohodnik.si</h1>
-                <p class="lead">
-                    Prijavi se na pohode, pridruži društvu in oceni svoje
-                    izkušnje v naravi!
-                </p>
+                <div class="row">
+                    <div class="col-lg-10 offset-lg-1">
+                        <h6 class="text-center mb-4 text-uppercase">
+                            Naši Partnerji
+                        </h6>
+                        <div
+                            class="d-flex justify-content-center align-items-center text-center"
+                        >
+                            <div>
+                                <img
+                                    src="../images/partner-logo-1.png"
+                                    alt="Partner Logo 1"
+                                    class="mx-4"
+                                />
+                            </div>
+                            <div class="d-none d-sm-block">
+                                <img
+                                    src="../images/partner-logo-2.png"
+                                    alt="Partner Logo 2"
+                                    class="mx-4"
+                                />
+                            </div>
+                            <div class="d-none d-md-block">
+                                <img
+                                    src="../images/partner-logo-3.png"
+                                    alt="Partner Logo 3"
+                                    class="mx-4"
+                                />
+                            </div>
+                            <div class="d-none d-lg-block">
+                                <img
+                                    src="../images/partner-logo-4.png"
+                                    alt="Partner Logo 4"
+                                    class="mx-4"
+                                />
+                            </div>
+                            <div class="d-none d-lg-block"></div>
+                            <img
+                                src="../images/partner-logo-5.png"
+                                alt="Partner Logo 5"
+                                class="mx-4"
+                            />
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
-        <div class="container">
-            <h2 class="section-title">Kaj ponujamo</h2>
-            <div class="row text-center">
-                <div
-                    class="col-md-4 mb-4"
-                    data-aos="fade-up"
-                    data-aos-delay="100"
-                >
-                    <div class="card p-4">
-                        <h4>Prijava na pohod</h4>
-                        <p>
-                            Izberi svoj najljubši pohod in se prijavi enostavno.
-                        </p>
-                        <a class="btn btn-outline-success" href="pohodi.html"
-                            >Prijavi se</a
-                        >
-                    </div>
-                </div>
-                <div
-                    class="col-md-4 mb-4"
-                    data-aos="fade-up"
-                    data-aos-delay="300"
-                >
-                    <div class="card p-4">
-                        <h4>Včlanitev v društvo</h4>
-                        <p>
-                            Postani del pohodniške skupnosti in uživaj v
-                            ugodnostih članstva.
-                        </p>
-                        <a class="btn btn-outline-success" href="drustva.html"
-                            >Včlani se</a
-                        >
-                    </div>
-                </div>
-                <div
-                    class="col-md-4 mb-4"
-                    data-aos="fade-up"
-                    data-aos-delay="500"
-                >
-                    <div class="card p-4">
-                        <h4>Ustvari račun</h4>
-                        <p>
-                            Prijavite se kot društvo ali pohodnik in raziščite
-                            svoje možnosti.
-                        </p>
-                        <a class="btn btn-outline-success" href="prijava.html"
-                            >Prijavi se</a
-                        >
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="container mt-5" data-aos="fade-up" data-aos-delay="400">
-            <div class="row text-center">
-                <div class="col-md-4">
-                    <img
-                        src="slike/index-1.jpg"
-                        class="img-fluid"
-                        alt="index-1"
-                        data-aos="fade-up"
-                        data-aos-delay="400"
-                    />
-                </div>
-
-                <div class="col-md-8" data-aos="fade-up" data-aos-delay="200">
-                    <h2>
-                        Pohodnik.si je zvest spremljevalec ljubiteljev narave že
-                        več let.
-                    </h2>
-                    <p>
-                        Naša spletna stran združuje pohodniške navdušence iz vse
-                        Slovenije, ki se vsakodnevno prijavljajo na organizirane
-                        pohode, ocenjujejo poti in se povezujejo z drugimi
-                        pohodniki. Z večletno prisotnostjo smo si pridobili
-                        zaupanje številnih društev in posameznikov, ki nam z
-                        veseljem zaupajo organizacijo, informacije in ocene
-                        pohodniških doživetij. Z uporabo platforme Pohodnik.si
-                        so se povezali že stotine članov, mnogi med njimi pa nas
-                        spremljajo od samega začetka. Z vami rastemo, stopamo in
-                        raziskujemo nove poti – skupaj.
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <footer>
+        <!-- Info Area -->
+        <section id="contact" class="contact my-7">
             <div class="container">
-                <ul class="nav justify-content-center border-bottom pb-3 mb-3">
-                    <li class="nav-item">
-                        <a href="#" class="nav-link px-2 text-white">Domov</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link px-2 text-white">Pohodi</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link px-2 text-white">Društva</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link px-2 text-white"
-                            >Prijavi se</a
-                        >
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link px-2 text-white"
-                            >Registriraj se</a
-                        >
-                    </li>
-                </ul>
-                <p class="text-center text-white">
-                    © 2025 Pohodnik.si – Skupaj raziskujemo naravo.
-                </p>
-            </div>
-        </footer>
+                <div class="row">
+                    <div class="col-md-6 mb-5">
+                        <h2 class="fw-bold text-center">
+                            Spremljevalec Pohodnikov in Društev
+                        </h2>
+                        <hr class="hr-heading-primary w-100 my-3" />
+                        <p class="lead">
+                            Naša spletna stran povezuje pohodniške navdušence iz
+                            vse Slovenije in pohodniška društva.
+                        </p>
+                        <ul class="list-unstyled lh-lg">
+                            <li class="d-flex align-items-center my-3">
+                                <i class="fas fa-check text-primary mx-3"></i>
+                                <div>
+                                    <strong>Organizacija Pohodov: </strong
+                                    >Ocenjevanje, urejanje, zbiranje,
+                                    načrtovanje in prijavljanje na pohode. Vse
+                                    na enem mestu, vse v samo eni aplikaciji.
+                                </div>
+                            </li>
+                            <li class="d-flex align-items-center">
+                                <i class="fas fa-check text-primary mx-3"></i>
+                                <div>
+                                    <strong>Sodelovanje z Društvi:</strong> We Z
+                                    večletno prisotnostjo smo si pridobili
+                                    zaupanje številnih društev in posameznikov,
+                                    ki nam z veseljem zaupajo organizacijo,
+                                    informacije in ocene pohodniških doživetij.
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-md-5 offset-md-1">
+                        <div class="row text-center mb-5">
+                            <div class="col-md-4">
+                                <h2
+                                    class="counter xl-text"
+                                    data-target="328"
+                                ></h2>
+                                <p class="lead">Registriranih Uporabnikov</p>
+                            </div>
 
+                            <div class="col-md-4">
+                                <h2
+                                    class="counter xl-text"
+                                    data-target="14"
+                                ></h2>
+                                <p class="lead">Društev</p>
+                            </div>
+
+                            <div class="col-md-4">
+                                <h2
+                                    class="counter xl-text"
+                                    data-target="159"
+                                ></h2>
+                                <p class="lead">Pohodov</p>
+                            </div>
+                        </div>
+                        <div class="row text-center">
+                            <div class="col-md-6 mb-3">
+                                <a
+                                    href="./prijava.html"
+                                    class="btn btn-primary text-white btn-lg w-100"
+                                    >Registracija</a
+                                >
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <a
+                                    href="./pohodi.html"
+                                    class="btn btn-secondary text-light btn-lg w-100"
+                                    >Pohodi</a
+                                >
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Details 1 -->
+        <section
+            id="details"
+            class="details my-5 position-relative"
+            data-aos="fade-left"
+            data-aos-duration="1000"
+            data-aos-delay="200"
+        >
+            <div class="container">
+                <div class="row pt-5">
+                    <div class="col-lg-6">
+                        <h2 class="fw-bold">
+                            Uporabniška Podpora in Dostopnost
+                        </h2>
+                        <hr class="hr-heading-primary" />
+                        <p>
+                            Nudimo celovito podporo pri uporabi naše platforme,
+                            da zagotovimo brezhibno uporabniško izkušnjo za vse
+                            pohodnike.
+                        </p>
+                        <ul class="list-unstyled lh-lg">
+                            <li class="d-flex align-items-center">
+                                <i class="fas fa-check text-primary mx-3 me-4">
+                                </i>
+                                <div>
+                                    <strong class="text-primary"
+                                        >Rešitve po meri: </strong
+                                    >Naše storitve so prilagojene vašim osebnim
+                                    interesom in pohodniškim ciljem.
+                                </div>
+                            </li>
+                            <li class="d-flex align-items-center">
+                                <i
+                                    class="fas fa-check text-primary mx-3 me-4"
+                                ></i>
+                                <div>
+                                    <strong class="text-primary"
+                                        >Enostavna uporaba:</strong
+                                    >
+                                    Spletna stran je zasnovana z mislijo na
+                                    enostavno in intuitivno uporabo za vse
+                                    generacije pohodnikov.
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-6 mt-4 mt-md-0">
+                        <img
+                            src="../images/details-1.jpg"
+                            alt="Details 1"
+                            class="img-fluid rounded-2"
+                        />
+                    </div>
+                </div>
+            </div>
+            <img
+                src="./images/vertical-decoration-left.png"
+                alt="Decor"
+                class="vertical-decoration position-absolute d-none d-md-block"
+            />
+        </section>
+
+        <!-- Details 2 -->
+        <section
+            id="details"
+            class="details-2 my-5 position-relative"
+            data-aos="fade-right"
+            data-aos-duration="1000"
+            data-aos-delay="200"
+        >
+            <div class="container">
+                <div class="row pt-5">
+                    <div class="col-lg-6">
+                        <img
+                            src="./images/details-2.jpg"
+                            alt="Details 2"
+                            class="img-fluid rounded-2 d-none d-md-block"
+                        />
+                    </div>
+                    <div class="col-lg-6">
+                        <h2 class="fw-bold">Vzdrževanje in Podpora</h2>
+                        <hr class="hr-heading-secondary" />
+                        <p>
+                            Zagotavljamo zanesljivo tehnično podporo in redno
+                            vzdrževanje za društva, ki uporabljajo našo
+                            platformo za organizacijo pohodov in upravljanje
+                            članstva.
+                        </p>
+                        <ul class="list-unstyled lh-lg">
+                            <li class="d-flex align-items-center">
+                                <i
+                                    class="fas fa-check text-secondary mx-3 me-4"
+                                >
+                                </i>
+                                <div>
+                                    <strong class="text-secondary"
+                                        >Proaktivno vzdrževanje:</strong
+                                    >
+                                    Redno nadzorujemo delovanje sistema in
+                                    sproti odpravljamo morebitne težave.
+                                </div>
+                            </li>
+                            <li class="d-flex align-items-center">
+                                <i
+                                    class="fas fa-check text-secondary mx-3 me-4"
+                                ></i>
+                                <div>
+                                    <strong class="text-secondary"
+                                        >Posodobitve:</strong
+                                    >
+                                    Vaša društvena stran bo vedno posodobljena z
+                                    najnovejšimi funkcijami in varnostnimi
+                                    popravki.
+                                </div>
+                            </li>
+                        </ul>
+                        <img
+                            src="./images/details-2.jpg"
+                            alt="Details 2"
+                            class="img-fluid rounded-2 d-md-none mt-4"
+                        />
+                    </div>
+                </div>
+            </div>
+            <img
+                src="./images/vertical-decoration-right.png"
+                alt="Decor"
+                class="vertical-decoration position-absolute d-none d-md-block"
+            />
+        </section>
+
+        <!-- Services -->
+        <section
+            id="services"
+            class="services bg-light py-5 mt-6"
+            data-aos="fade-up"
+            data-aos-delay="400"
+        >
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-5">
+                        <div class="text-container text-center text-lg-start">
+                            <h2>
+                                <span class="text-primary">Ponudba</span>
+                                za pohodnike in društva
+                            </h2>
+                            <p>
+                                At our company, we provide a wide range of
+                                services to meet all your office design needs.
+                                With our expertise and attention to detail, we
+                                ensure that every aspect of your office space is
+                                carefully considered and executed.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-lg-7">
+                        <div class="row mb-4">
+                            <div
+                                class="col-md-4 d-flex flex-column align-items-center text-center"
+                            >
+                                <i
+                                    class="fas fa-rocket fa-4x text-secondary mb-2"
+                                ></i>
+                                <p class="fs-5 fw-bold">Brskanje po Pohodih</p>
+                            </div>
+                            <div
+                                class="col-md-4 d-flex flex-column align-items-center text-center"
+                            >
+                                <i
+                                    class="fas fa-star fa-4x text-secondary mb-2"
+                                ></i>
+                                <p class="fs-5 fw-bold">Značke Aktivnosti</p>
+                            </div>
+                            <div
+                                class="col-md-4 d-flex flex-column align-items-center text-center"
+                            >
+                                <i
+                                    class="fas fa-comments fa-4x text-secondary mb-2"
+                                ></i>
+                                <p class="fs-5 fw-bold">Mnenja in Ocene</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div
+                                class="col-md-4 d-flex flex-column align-items-center text-center"
+                            >
+                                <i
+                                    class="fas fa-bullhorn fa-4x text-secondary mb-2"
+                                ></i>
+                                <p class="fs-5 fw-bold">Objava Pohodov</p>
+                            </div>
+                            <div
+                                class="col-md-4 d-flex flex-column align-items-center text-center"
+                            >
+                                <i
+                                    class="fas fa-chart-bar fa-4x text-secondary mb-2"
+                                ></i>
+                                <p class="fs-5 fw-bold">Vodenje Članstva</p>
+                            </div>
+                            <div
+                                class="col-md-4 d-flex flex-column align-items-center text-center"
+                            >
+                                <i
+                                    class="fas fa-database fa-4x text-secondary mb-2"
+                                ></i>
+                                <p class="fs-5 fw-bold">Hranjenje Podatkov</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Video -->
+        <section class="video my-6">
+            <div class="container" data-aos="fade-up" data-aos-delay="400">
+                <div class="row">
+                    <div class="col-12 d-flex flex-column align-items-center">
+                        <div class="position-relative">
+                            <img
+                                src="../images/video-preview.jpg"
+                                alt="Video"
+                                class="img-fluid"
+                            />
+                            <a
+                                class="video-btn"
+                                data-bs-toggle="modal"
+                                data-bs-target="#videoModal"
+                                data-bs-src="https://www.youtube.com/embed/aIIAi4L8qbs?si=mN-3OHsaT8LuI5ER"
+                            >
+                                <span class="video-play-button">
+                                    <span></span>
+                                </span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="row video-points px-6 mt-5">
+                    <div class="col-lg-4">
+                        <h4 class="fw-bold">Več kot 10 let izkušenj</h4>
+                        <hr class="hr-heading-primary" />
+                        <p>
+                            Z več kot desetletjem izkušenj smo pridobili
+                            dragoceno znanje in razumevanje potreb pohodnikov
+                            ter društev. Z nami boste vedno na pravi poti.
+                        </p>
+                    </div>
+                    <div class="col-lg-4">
+                        <h4 class="fw-bold">Zanesljiva partnerstva</h4>
+                        <hr class="hr-heading-secondary" />
+                        <p>
+                            Gradimo dolgoročna in zaupanja vredna partnerstva z
+                            društvi in posamezniki. Skupaj ustvarjamo uspešne
+                            zgodbe v naravi.
+                        </p>
+                    </div>
+                    <div class="col-lg-4">
+                        <h4 class="fw-bold">Predana in izkušena ekipa</h4>
+                        <hr class="hr-heading-primary" />
+                        <p>
+                            Naša ekipa je sestavljena iz zagnanih strokovnjakov,
+                            ki s strastjo skrbijo za nemoteno delovanje
+                            platforme in podporo uporabnikom.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video Modal -->
+            <div class="video-modal">
+                <div id="videoModal" class="modal fade">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="ratio ratio-16x9">
+                                <iframe
+                                    frameborder="0"
+                                    class="embed-responsive-item"
+                                    id="video"
+                                ></iframe>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Newsletter -->
+        <section id="newsletter" class="newsletter my-6">
+            <div class="container" data-aos="fade-up" data-aos-delay="400">
+                <div class="row mb-4">
+                    <div
+                        class="col-md-6 offset-md-3 d-flex flex-column align-items-center text-center"
+                    >
+                        <div class="text-start">
+                            <h2 class="fw-bold">Naroči se in sledi</h2>
+                            <hr class="hr-heading-secindary w-100" />
+                        </div>
+                        <p>
+                            Ostanite na tekočem z našimi novicami in obvestili.
+                            Naročite se na naše e-novice in spremljajte nas na
+                            družbenih omrežjih za koristne informacije in
+                            zanimive novosti.
+                        </p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div
+                        class="col-md-6 offset-md-3 d-flex flex-column align-items-center text-center"
+                    >
+                        <div class="input-group mb-3">
+                            <input
+                                type="email"
+                                class="form-control"
+                                placeholder="Vnesi svoj e-mail"
+                                required
+                            />
+                            <button
+                                class="btn btn-primary text-white rounded-0"
+                                type="button"
+                            >
+                                Pošlji
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <div id="footer"></div>
+
+        <button id="to-top" class="to-top-btn">
+            <img src="../images/up-arrow.png" alt="up" />
+        </button>
+
+        <script src="../components/Navbar.js"></script>
+        <script src="../components/Footer.js"></script>
+        <script src="js/replaceme.min.js"></script>
         <script src="../js/bootstrap.bundle.min.js"></script>
-        <script src="../js/scrpit.js"></script>
+        <script src="../js/script.js"></script>
         <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
         <script>
             AOS.init();
