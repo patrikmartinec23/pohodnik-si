@@ -6,6 +6,7 @@ Simple Node.js + Express web app for managing and viewing hiking data (Pohodnik.
 
 ## 📁 Project Structure
 
+```bash
 project-root/
 ├── public/
 │ ├── css/ # Compiled CSS files (from SCSS)
@@ -18,6 +19,7 @@ project-root/
 ├── db.js # MySQL database connection
 ├── package.json
 └── .gitignore
+```
 
 ---
 
