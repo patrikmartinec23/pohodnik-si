@@ -28,8 +28,16 @@ project-root/
 ```bash
 git clone git@gitlab.com:omarzdra/pohodnik.git
 cd pohodnik
+```
 
+### 2. Install dependencies
+
+```bash
 npm install
+```
 
+### 3. Run the project
+
+```bash
 npm run start
 ```
