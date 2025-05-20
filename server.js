@@ -23,6 +23,97 @@ app.get('/api/pohodi', async (req, res) => {
   }
 });
 
+app.post('/api/registracija-pohodnik', async (req, res) => {
+  const {
+    uporabniskoIme,
+    geslo,
+    ime,
+    priimek,
+    datumRojstva,
+    naslov
+  } = req.body;
+
+  if (!uporabniskoIme || !geslo || !ime || !priimek || !datumRojstva || !naslov) {
+    return res.status(400).json({ error: 'Manjkajo podatki za registracijo' });
+  }
+
+  const connection = await povezava();
+
+  try {
+    await connection.beginTransaction();
+
+    const [rezultatUporabnik] = await connection.query(
+      `INSERT INTO uporabnik (uporabniskoIme, geslo) VALUES (?, ?)`,
+      [uporabniskoIme, geslo]
+    );
+
+    const TK_Uporabnik = rezultatUporabnik.insertId;
+
+    await connection.query(
+      `INSERT INTO pohodnik (ime, priimek, datumRojstva, prebivalisce, TK_Uporabnik)
+       VALUES (?, ?, ?, ?, ?)`,
+      [ime, priimek, datumRojstva, naslov, TK_Uporabnik]
+    );
+
+    await connection.commit();
+    res.status(201).json({ success: true, id: TK_Uporabnik });
+
+  } catch (err) {
+    await connection.rollback();
+    console.error('Napaka pri registraciji:', err);
+    res.status(500).json({ error: 'Napaka pri registraciji uporabnika' });
+  } finally {
+    await connection.end();
+  }
+});
+
+
+app.post('/api/registracija-drustvo', async (req, res) => {
+  const {
+    uporabniskoIme,
+    geslo,
+    drustvoIme,
+    naslov,
+    letoUstanovitve,
+    predsednik
+  } = req.body;
+
+  if (!uporabniskoIme || !geslo || !drustvoIme || !naslov || !letoUstanovitve || !predsednik) {
+    return res.status(400).json({ error: 'Manjkajo podatki za registracijo' });
+  }
+
+  const connection = await povezava();
+
+  try {
+    await connection.beginTransaction();
+
+    const [rezultatUporabnik] = await connection.query(
+      `INSERT INTO uporabnik (uporabniskoIme, geslo) VALUES (?, ?)`,
+      [uporabniskoIme, geslo]
+    );
+
+    const TK_Uporabnik = rezultatUporabnik.insertId;
+
+    await connection.query(
+      `INSERT INTO PohodniskoDrustvo (drustvoIme, naslov, letoUstanovitve, predsednik, TK_Uporabnik)
+       VALUES (?, ?, ?, ?, ?)`,
+      [drustvoIme, naslov, letoUstanovitve, predsednik, TK_Uporabnik]
+    );
+
+    await connection.commit();
+    res.status(201).json({ success: true, id: TK_Uporabnik });
+
+  } catch (err) {
+    await connection.rollback();
+    console.error('Napaka pri registraciji:', err);
+    res.status(500).json({ error: 'Napaka pri registraciji uporabnika' });
+  } finally {
+    await connection.end();
+  }
+});
+
+
+
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());

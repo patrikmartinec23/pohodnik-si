@@ -1,12 +1,22 @@
 CREATE DATABASE IF NOT EXISTS Pohodniki;
 USE Pohodniki;
 
+
+
+DROP TABLE IF EXISTS fotografija;
+DROP TABLE IF EXISTS prijava;
+DROP TABLE IF EXISTS komentar;
+DROP TABLE IF EXISTS clanarina;
+DROP TABLE IF EXISTS pohod;
+DROP TABLE IF EXISTS pohodniskodrustvo;
+DROP TABLE IF EXISTS pohodnik;
+DROP TABLE IF EXISTS uporabnik;
 -- -----------------------------------------------------
 -- Table Uporabnik
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS Uporabnik (
   IDUporabnik INT NOT NULL AUTO_INCREMENT,
-  UporabniškoIme VARCHAR(30) NOT NULL,
+  UporabniskoIme VARCHAR(30) NOT NULL,
   Geslo VARCHAR(20) NOT NULL,
   PRIMARY KEY (IDUporabnik)
 );
@@ -43,7 +53,7 @@ CREATE TABLE IF NOT EXISTS Pohod (
   TK_PohodniskoDrustvo INT NOT NULL,
   ZbirnoMesto VARCHAR(45) NOT NULL,
   PohodOpis VARCHAR(100) NOT NULL,
-  Težavnost INT NOT NULL,
+  Tezavnost INT NOT NULL,
   Trajanje TIME NOT NULL,
   ObveznaOprema VARCHAR(100) NOT NULL,
   PricakovaneRazmere VARCHAR(45) NOT NULL,
@@ -168,9 +178,9 @@ SELECT * FROM Pohodnik;
 SELECT * FROM PohodniskoDrustvo;
 SELECT * FROM Pohod;
 
-INSERT INTO Uporabnik(UporabniškoIme,Geslo)
+INSERT INTO Uporabnik(UporabniskoIme,Geslo)
 VALUES('Mako','Mako123');
-INSERT INTO Uporabnik(UporabniškoIme,Geslo)
+INSERT INTO Uporabnik(UporabniskoIme,Geslo)
 VALUES('PDMaribor','mojPohod');
     
 INSERT INTO Pohodnik (Ime, Priimek, DatumRojstva,Prebivalisce,TK_Uporabnik)
@@ -180,9 +190,9 @@ INSERT INTO PohodniskoDrustvo (DrustvoIme,Naslov,LetoUstanovitve,Predsednik,TK_U
 VALUES('Pohodno društvo Maribor', 'Tezenska ulica 12, 2000 Maribor', 2003, 'Miran Poženi',2);
 
 INSERT INTO Clanarina (TK_PohodniskoDrustvo,TK_Pohodnik)
-VALUES (2,1);
+VALUES (1,1);
 
-INSERT INTO Pohod(PohodIme,Lokacija,DatumPohoda,TK_PohodniskoDrustvo,ZbirnoMesto,PohodOpis,Težavnost,Trajanje,ObveznaOprema,PricakovaneRazmere,Prevoz,StroskiPrevoza,ProstaMesta,Vodic,VodicKontakt)
+INSERT INTO Pohod(PohodIme,Lokacija,DatumPohoda,TK_PohodniskoDrustvo,ZbirnoMesto,PohodOpis,Tezavnost,Trajanje,ObveznaOprema,PricakovaneRazmere,Prevoz,StroskiPrevoza,ProstaMesta,Vodic,VodicKontakt)
 VALUES('Pohod na Raduho', 'Raduha', '2025-06-12',1,'Pod Raduho','Celodnevni pohod na Raduho',2,'08:00:00','Pohodni čevlji','Sončno','Samostojni Prevoz', '0.00',25,'Gregor Maček','040123455');
 
 INSERT INTO Fotografija (Fotografija,Opis,TK_Pohod)
@@ -194,7 +204,9 @@ VALUES(1,1,'Zelo dobro',5);
 INSERT INTO Prijava (TK_Pohod,TK_Pohodnik,DatumPrijave)
 VALUES(1,1,'2025-05-18');
 
+SELECT * FROM Pohod;
 
 
-
+SELECT * FROM Uporabnik;
+SELECT * FROM pohodniskodrustvo;
 
