@@ -59,7 +59,7 @@ class FooterComponent {
                     },
                 ],
                 contact: {
-                    text: 'Radi bi slišali vaše mnenje? Pišite nam na',
+                    text: 'Radi bi slišali vaše mnenje, pišite nam na:',
                     email: 'pohodnik@site.si',
                 },
             },
@@ -70,7 +70,7 @@ class FooterComponent {
         const { about, links, social } = this.footerData;
 
         this.container.innerHTML = `
-            <footer class="footer bg-primary py-6 text-white">
+            <footer class="footer bg-secondary py-6 text-white">
                 <div class="container">
                     <div class="row">
                         <div class="col-md-4 my-3">

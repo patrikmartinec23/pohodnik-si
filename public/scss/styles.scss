@@ -5,6 +5,13 @@ html, body {
     padding: 0;
 }
 
+$footer-height: 8rem;
+
+#main-content {
+    min-height: 65vh;
+}
+
+
 .container {
     width: 100%;
     padding-right: 15px;
@@ -40,7 +47,7 @@ html, body {
     font-size: 65px;
 }
 
-$navbar-height: 76px;
+$navbar-height: 80px;
 
 .header {
     background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url('../images/header-background.jpg') left center no-repeat;
@@ -48,6 +55,63 @@ $navbar-height: 76px;
     background-size: cover;
     height: 600px;
     margin-top: $navbar-height;
+}
+
+.pohodi {
+    height: auto;
+    margin-top: $navbar-height;
+}
+
+.card {
+    transition: all 0.3s ease;
+    border: none;
+    
+    &.hover-shadow:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        cursor: pointer;
+    }
+
+    a {
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .card-img-top {
+        height: 200px;
+        object-fit: cover;
+    }
+
+    .badge {
+        font-weight: normal;
+        padding: 0.5em 0.8em;
+    }
+
+    .card-body {
+        padding: 1.25rem;
+    }
+
+    .small {
+        font-size: 0.875rem;
+    }
+}
+
+.project-modals .modal-dialog {
+    max-width: 1150px;
+    margin-top: 130px;
+}
+
+// Modal positioning
+.modal-dialog.mt-7 {
+    margin-top: 2rem !important;  // Reduce from 7rem to show higher
+    max-height: 90vh;             // Prevent modal from being too tall
+    overflow-y: auto;             // Add scrolling if content is too long
+}
+
+// Ensure modal content doesn't overflow
+.modal-content {
+    max-height: calc(90vh - 3rem); // Leave some space for margins
+    overflow-y: auto;
 }
 
 .vertical-decoration {
@@ -167,6 +231,18 @@ h5 .badge {
 .video-modal .modal-dialog {
     max-width: 1150px;
     margin-top: 20px;
+}
+
+@keyframes pulse-border {
+    0% {
+        transform: translateX(-50%) translateY(-50%) translateZ(0) scale(1);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateX(-50%) translateY(-50%) translateZ(0) scale(1.5);
+        opacity: 0;
+    }
 }
 
 .to-top-btn {
