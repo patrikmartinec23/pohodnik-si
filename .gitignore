@@ -35,3 +35,5 @@ public/css/*.css
 *.sql
 *.sqlite
 *.db
+*.mwb
+*.mwb.bak
