@@ -33,17 +33,28 @@
             .form-check-inline input {
                 margin-right: 5px;
             }
+
+            .error-message {
+                color: #dc3545;
+                font-size: 0.875rem;
+                margin-top: 0.5rem;
+                display: none;
+            }
         </style>
     </head>
-    <body>
+    <body class="bg-light">
         <!-- Navigation -->
         <div id="navbar"></div>
 
-        <div class="login-container" data-aos="fade-up" data-aos-delay="200">
-            <img src="slike/logo.png" alt="Pohodnik.si" class="logo" />
+        <div
+            class="login-container mt-8"
+            data-aos="fade-up"
+            data-aos-delay="200"
+        >
+            <img src="../images/logo.png" alt="Pohodnik.si" class="logo" />
             <h4 class="text-center mb-3">Prijava</h4>
 
-            <form>
+            <form id="loginForm">
                 <div class="mb-3">
                     <label class="form-label">Vrsta uporabnika:</label><br />
                     <div class="form-check form-check-inline">
@@ -97,6 +108,8 @@
                     />
                 </div>
 
+                <div id="loginError" class="error-message"></div>
+
                 <div class="d-grid">
                     <button type="submit" class="btn btn-success">
                         Prijava
@@ -113,11 +126,40 @@
         <!-- Footer -->
         <div id="footer"></div>
 
+        <script src="../utils/Auth.js"></script>
         <script src="../components/Navbar.js"></script>
         <script src="../components/Footer.js"></script>
-        <script src="js/replaceme.min.js"></script>
         <script src="../js/bootstrap.bundle.min.js"></script>
         <script src="../js/script.js"></script>
+        <script>
+            document
+                .getElementById('loginForm')
+                .addEventListener('submit', async (e) => {
+                    e.preventDefault();
+
+                    const username = document.getElementById('username').value;
+                    const password = document.getElementById('password').value;
+                    const type = document.querySelector(
+                        'input[name="userType"]:checked'
+                    ).value;
+                    const errorElement = document.getElementById('loginError');
+
+                    errorElement.style.display = 'none';
+
+                    const result = await Auth.login(username, password, type);
+
+                    if (result.success) {
+                        window.location.href = '/pages/pohodi.html';
+                    } else {
+                        errorElement.textContent = result.error;
+                        errorElement.style.display = 'block';
+                    }
+                });
+
+            if (Auth.isLoggedIn()) {
+                window.location.href = '/pages/pohodi.html';
+            }
+        </script>
         <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
         <script>
             AOS.init();

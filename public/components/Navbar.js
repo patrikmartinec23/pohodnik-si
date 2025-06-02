@@ -4,7 +4,7 @@ class NavbarComponent {
         this.navData = {
             brand: {
                 href: '/',
-                logo: 'images/logo.png',
+                logo: '../images/logo.png',
                 logoWidth: 100,
                 text: 'pohodnik.si',
             },
@@ -12,8 +12,8 @@ class NavbarComponent {
                 { text: 'Domov', href: 'index.html#', active: true },
                 { text: 'Pohodi', href: './pohodi.html', active: false },
                 { text: 'Društva', href: './drustva.html', active: false },
-                { text: 'Prijavi Se', href: './prijava.html', active: false },
             ],
+
             socialLinks: [
                 {
                     platform: 'facebook',
@@ -31,6 +31,7 @@ class NavbarComponent {
 
     render() {
         const { brand, links, socialLinks } = this.navData;
+        const user = Auth.getUser();
 
         this.container.innerHTML = `
             <nav class="navbar navbar-expand-lg sticky-top navbar-dark bg-primary">
@@ -65,6 +66,27 @@ class NavbarComponent {
                             `
                                 )
                                 .join('')}
+                            
+                            ${
+                                user
+                                    ? `
+        <li class="nav-item">
+            <a class="nav-link" href="./profil.html">
+                <i class="fas fa-user me-1"></i>${user.username}
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-warning" href="#" onclick="Auth.logout()">
+                <i class="fas fa-sign-out-alt me-1"></i>Odjava
+            </a>
+        </li>
+    `
+                                    : `
+        <li class="nav-item">
+            <a class="nav-link" href="./prijava.html">Prijavi Se</a>
+        </li>
+    `
+                            }
                         </ul>
                         <span class="nav-item">
                             ${socialLinks
