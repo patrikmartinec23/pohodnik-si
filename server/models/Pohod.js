@@ -1,49 +1,204 @@
-const povezava = require('../config/db');
+const db = require('../config/db');
 
 class Pohod {
     static async getAll() {
-        const connection = await povezava();
         try {
-            const [rows] = await connection.query('SELECT * FROM Pohod');
-            return rows;
-        } finally {
-            await connection.end();
+            return await db('Pohod as p')
+                .select('p.*', 'pd.DrustvoIme as DrustvoIme')
+                .leftJoin(
+                    'PohodniskoDrustvo as pd',
+                    'p.TK_PohodniskoDrustvo',
+                    'pd.IDPohodniskoDrustvo'
+                )
+                .orderBy('p.DatumPohoda', 'desc');
+        } catch (error) {
+            console.error('Error in getAll:', error);
+            throw error;
         }
     }
 
     static async getById(id) {
-        const connection = await povezava();
         try {
-            const [rows] = await connection.query(
-                'SELECT * FROM Pohod WHERE id = ?',
-                [id]
-            );
-            return rows[0];
-        } finally {
-            await connection.end();
+            return await db('Pohod as p')
+                .select(
+                    'p.*',
+                    'pd.DrustvoIme as DrustvoIme',
+                    'pd.Naslov as DrustvoNaslov'
+                )
+                .leftJoin(
+                    'PohodniskoDrustvo as pd',
+                    'p.TK_PohodniskoDrustvo',
+                    'pd.IDPohodniskoDrustvo'
+                )
+                .where('p.IDPohod', id)
+                .first();
+        } catch (error) {
+            console.error('Error in getById:', error);
+            throw error;
         }
     }
 
     static async create(pohodData) {
-        const connection = await povezava();
         try {
-            const [result] = await connection.query(
-                'INSERT INTO Pohod (title, image, altitude, difficulty, duration, region, description, date, organizer) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                [
-                    pohodData.title,
-                    pohodData.image,
-                    pohodData.altitude,
-                    pohodData.difficulty,
-                    pohodData.duration,
-                    pohodData.region,
-                    pohodData.description,
-                    pohodData.date,
-                    pohodData.organizer,
-                ]
+            // Validate required fields
+            const requiredFields = [
+                'PohodIme',
+                'Lokacija',
+                'DatumPohoda',
+                'TK_PohodniskoDrustvo',
+                'ZbirnoMesto',
+                'PohodOpis',
+                'Tezavnost',
+                'Trajanje',
+                'ObveznaOprema',
+                'PricakovaneRazmere',
+                'Prevoz',
+                'StroskiPrevoza',
+                'ProstaMesta',
+                'Vodic',
+                'VodicKontakt',
+            ];
+
+            for (const field of requiredFields) {
+                if (!pohodData[field]) {
+                    throw new Error(`Missing required field: ${field}`);
+                }
+            }
+
+            const [id] = await db('Pohod').insert({
+                ...pohodData,
+                DatumPohoda: new Date(pohodData.DatumPohoda),
+                StroskiPrevoza: parseFloat(pohodData.StroskiPrevoza),
+                ProstaMesta: parseInt(pohodData.ProstaMesta),
+                Tezavnost: parseInt(pohodData.Tezavnost),
+            });
+            return id;
+        } catch (error) {
+            console.error('Error in create:', error);
+            throw error;
+        }
+    }
+
+    static async update(id, pohodData) {
+        try {
+            // Format data types
+            const updateData = {
+                ...pohodData,
+                DatumPohoda: pohodData.DatumPohoda
+                    ? new Date(pohodData.DatumPohoda)
+                    : undefined,
+                StroskiPrevoza: pohodData.StroskiPrevoza
+                    ? parseFloat(pohodData.StroskiPrevoza)
+                    : undefined,
+                ProstaMesta: pohodData.ProstaMesta
+                    ? parseInt(pohodData.ProstaMesta)
+                    : undefined,
+                Tezavnost: pohodData.Tezavnost
+                    ? parseInt(pohodData.Tezavnost)
+                    : undefined,
+            };
+
+            // Remove undefined fields
+            Object.keys(updateData).forEach(
+                (key) => updateData[key] === undefined && delete updateData[key]
             );
-            return result.insertId;
-        } finally {
-            await connection.end();
+
+            return await db('Pohod').where('IDPohod', id).update(updateData);
+        } catch (error) {
+            console.error('Error in update:', error);
+            throw error;
+        }
+    }
+
+    static async getFiltered(filters = {}) {
+        try {
+            let query = db('Pohod as p')
+                .select(
+                    'p.*',
+                    'pd.DrustvoIme as DrustvoIme',
+                    'pd.Naslov as DrustvoNaslov'
+                )
+                .leftJoin(
+                    'PohodniskoDrustvo as pd',
+                    'p.TK_PohodniskoDrustvo',
+                    'pd.IDPohodniskoDrustvo'
+                );
+
+            // Search by name or location
+            if (filters.search) {
+                query = query.where((builder) => {
+                    builder
+                        .where('p.PohodIme', 'like', `%${filters.search}%`)
+                        .orWhere('p.Lokacija', 'like', `%${filters.search}%`);
+                });
+            }
+
+            // Filter by difficulty
+            if (filters.difficulty) {
+                query = query.where('p.Tezavnost', filters.difficulty);
+            }
+
+            // Filter by location
+            if (filters.location) {
+                query = query.where(
+                    'p.Lokacija',
+                    'like',
+                    `%${filters.location}%`
+                );
+            }
+
+            // Filter by date range
+            if (filters.dateFrom) {
+                query = query.where('p.DatumPohoda', '>=', filters.dateFrom);
+            }
+            if (filters.dateTo) {
+                query = query.where('p.DatumPohoda', '<=', filters.dateTo);
+            }
+
+            // Filter by available spots
+            if (filters.availableOnly) {
+                query = query.where('p.ProstaMesta', '>', 0);
+            }
+
+            // Default sorting
+            query = query.orderBy('p.DatumPohoda', 'asc');
+
+            return await query;
+        } catch (error) {
+            console.error('Error in getFiltered:', error);
+            throw error;
+        }
+    }
+
+    static async delete(id) {
+        try {
+            return await db('Pohod').where('IDPohod', id).delete();
+        } catch (error) {
+            console.error('Error in delete:', error);
+            throw error;
+        }
+    }
+
+    // Additional helper methods
+    static async getByDrustvo(drustvoId) {
+        try {
+            return await db('Pohod')
+                .where('TK_PohodniskoDrustvo', drustvoId)
+                .orderBy('DatumPohoda', 'desc');
+        } catch (error) {
+            console.error('Error in getByDrustvo:', error);
+            throw error;
+        }
+    }
+
+    static async getUpcoming() {
+        try {
+            return await db('Pohod')
+                .where('DatumPohoda', '>', new Date())
+                .orderBy('DatumPohoda', 'asc');
+        } catch (error) {
+            console.error('Error in getUpcoming:', error);
+            throw error;
         }
     }
 }

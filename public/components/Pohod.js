@@ -58,7 +58,7 @@ class Pohod {
             </a>`;
 
         this.container.innerHTML = `
-            <section class="pohod-detail py-5">
+            <section class="pohod-detail">
                 <div class="container">
                     <!-- Header Section -->
                     <div class="row mb-4">
@@ -165,17 +165,33 @@ class Pohod {
                                             </span>
                                             <strong>${pohod.Prevoz}</strong>
                                         </li>
-                                        <li class="mb-3 d-flex justify-content-between">
-                                            <span class="text-muted">
-                                                <i class="fas fa-euro-sign me-2"></i>Stroški prevoza
-                                            </span>
-                                            <strong>${Number(
-                                                pohod.StroskiPrevoza
-                                            ).toFixed(2)} €</strong>
-                                        </li>
+                                        ${
+                                            Number(pohod.StroskiPrevoza) > 0
+                                                ? `
+        <li class="mb-3 d-flex justify-content-between">
+            <span class="text-muted">
+                <i class="fas fa-euro-sign me-2"></i>Stroški prevoza
+            </span>
+            <strong>${Number(pohod.StroskiPrevoza).toFixed(2)} €</strong>
+        </li>
+    `
+                                                : ''
+                                        }
                                     </ul>
 
                                     <hr class="my-4">
+
+                                  
+<div class="mb-3">
+    <h5 class="h6 mb-2">Organizator pohoda</h5>
+    <p class="mb-0">
+        <i class="fas fa-building me-2"></i>${pohod.DrustvoIme}
+    </p>
+    <small class="text-muted">
+        <i class="fas fa-map-marker-alt me-2"></i>${pohod.DrustvoNaslov}
+    </small>
+</div>
+
 
                                     <h4 class="h5 mb-3">Vodnik pohoda</h4>
                                     <div class="d-flex align-items-center mb-4">

@@ -1,5 +1,5 @@
 class Auth {
-    static async login(username, password, type) {
+    static async login(username, password) {
         try {
             const response = await fetch('/api/login', {
                 method: 'POST',
@@ -9,22 +9,26 @@ class Auth {
                 body: JSON.stringify({
                     uporabniskoIme: username,
                     geslo: password,
-                    tip: type,
                 }),
-                credentials: 'include', // Important for cookies
             });
 
             const data = await response.json();
 
-            if (data.success) {
-                localStorage.setItem('user', JSON.stringify(data.user));
-                return { success: true, user: data.user };
-            } else {
-                return { success: false, error: data.error };
+            if (!response.ok) {
+                return {
+                    success: false,
+                    error: data.error || 'Napaka pri prijavi',
+                };
             }
+
+            localStorage.setItem('user', JSON.stringify(data.user));
+            return data;
         } catch (error) {
             console.error('Login error:', error);
-            return { success: false, error: 'Napaka pri prijavi' };
+            return {
+                success: false,
+                error: 'Prišlo je do napake pri povezavi s strežnikom',
+            };
         }
     }
 
@@ -36,48 +40,41 @@ class Auth {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(userData),
-                credentials: 'include',
             });
 
             const data = await response.json();
 
-            if (data.success) {
-                localStorage.setItem('user', JSON.stringify(data.user));
-                return { success: true, user: data.user };
-            } else {
-                return { success: false, error: data.error };
+            if (!response.ok) {
+                return {
+                    success: false,
+                    error: data.error || 'Napaka pri registraciji',
+                };
             }
+
+            localStorage.setItem('user', JSON.stringify(data.user));
+            return data;
         } catch (error) {
             console.error('Registration error:', error);
-            return { success: false, error: 'Napaka pri registraciji' };
+            return {
+                success: false,
+                error: 'Prišlo je do napake pri povezavi s strežnikom',
+            };
         }
     }
 
-    static async logout() {
-        try {
-            await fetch('/api/logout', {
-                method: 'POST',
-                credentials: 'include',
-            });
-            localStorage.removeItem('user');
-            window.location.href = '/pages/prijava.html';
-        } catch (error) {
-            console.error('Logout error:', error);
-        }
-    }
-
-    static getUser() {
-        const user = localStorage.getItem('user');
-        return user ? JSON.parse(user) : null;
+    static logout() {
+        localStorage.removeItem('user');
+        fetch('/api/logout', { method: 'POST' })
+            .then(() => (window.location.href = '/pages/prijava.html'))
+            .catch(console.error);
     }
 
     static isLoggedIn() {
-        return !!this.getUser();
+        return !!localStorage.getItem('user');
     }
 
-    static redirectIfNotAuthenticated() {
-        if (!this.isLoggedIn()) {
-            window.location.href = '/pages/prijava.html';
-        }
+    static getUser() {
+        const userJson = localStorage.getItem('user');
+        return userJson ? JSON.parse(userJson) : null;
     }
 }

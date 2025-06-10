@@ -43,7 +43,6 @@
         </style>
     </head>
     <body class="bg-light">
-        <!-- Navigation -->
         <div id="navbar"></div>
 
         <div
@@ -55,35 +54,6 @@
             <h4 class="text-center mb-3">Prijava</h4>
 
             <form id="loginForm">
-                <div class="mb-3">
-                    <label class="form-label">Vrsta uporabnika:</label><br />
-                    <div class="form-check form-check-inline">
-                        <input
-                            class="form-check-input"
-                            type="radio"
-                            name="userType"
-                            id="hiker"
-                            value="pohodnik"
-                            checked
-                        />
-                        <label class="form-check-label" for="hiker"
-                            >Pohodnik</label
-                        >
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input
-                            class="form-check-input"
-                            type="radio"
-                            name="userType"
-                            id="club"
-                            value="drustvo"
-                        />
-                        <label class="form-check-label" for="club"
-                            >Društvo</label
-                        >
-                    </div>
-                </div>
-
                 <div class="mb-3">
                     <label for="username" class="form-label"
                         >Uporabniško ime</label
@@ -103,7 +73,7 @@
                         type="password"
                         class="form-control"
                         id="password"
-                        placeholder="vnesi geslo"
+                        placeholder="Vnesi geslo"
                         required
                     />
                 </div>
@@ -123,43 +93,14 @@
             </p>
         </div>
 
-        <!-- Footer -->
         <div id="footer"></div>
 
+        <!-- Scripts -->
         <script src="../utils/Auth.js"></script>
         <script src="../components/Navbar.js"></script>
         <script src="../components/Footer.js"></script>
+        <script src="../components/Login.js"></script>
         <script src="../js/bootstrap.bundle.min.js"></script>
-        <script src="../js/script.js"></script>
-        <script>
-            document
-                .getElementById('loginForm')
-                .addEventListener('submit', async (e) => {
-                    e.preventDefault();
-
-                    const username = document.getElementById('username').value;
-                    const password = document.getElementById('password').value;
-                    const type = document.querySelector(
-                        'input[name="userType"]:checked'
-                    ).value;
-                    const errorElement = document.getElementById('loginError');
-
-                    errorElement.style.display = 'none';
-
-                    const result = await Auth.login(username, password, type);
-
-                    if (result.success) {
-                        window.location.href = '/pages/pohodi.html';
-                    } else {
-                        errorElement.textContent = result.error;
-                        errorElement.style.display = 'block';
-                    }
-                });
-
-            if (Auth.isLoggedIn()) {
-                window.location.href = '/pages/pohodi.html';
-            }
-        </script>
         <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
         <script>
             AOS.init();

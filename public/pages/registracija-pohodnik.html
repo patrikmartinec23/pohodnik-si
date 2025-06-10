@@ -104,43 +104,7 @@
         <script src="../components/Navbar.js"></script>
         <script src="../components/Footer.js"></script>
         <script src="../js/bootstrap.bundle.min.js"></script>
-        <script>
-            document
-                .getElementById('registerForm')
-                .addEventListener('submit', async (e) => {
-                    e.preventDefault();
-
-                    const username = document.getElementById('username').value;
-                    const password = document.getElementById('password').value;
-                    const confirmPassword =
-                        document.getElementById('confirmPassword').value;
-                    const errorElement =
-                        document.getElementById('registerError');
-
-                    if (password !== confirmPassword) {
-                        errorElement.textContent = 'Gesli se ne ujemata';
-                        errorElement.style.display = 'block';
-                        return;
-                    }
-
-                    const result = await Auth.register({
-                        uporabniskoIme: username,
-                        geslo: password,
-                        tip: 'pohodnik',
-                    });
-
-                    if (result.success) {
-                        window.location.href = '/pages/pohodi.html';
-                    } else {
-                        errorElement.textContent = result.error;
-                        errorElement.style.display = 'block';
-                    }
-                });
-
-            if (Auth.isLoggedIn()) {
-                window.location.href = '/pages/pohodi.html';
-            }
-        </script>
+        <script src="../components/RegisterPohodnik.js"></script>
         <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
         <script>
             AOS.init();

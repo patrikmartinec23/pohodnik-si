@@ -35,7 +35,7 @@ class Drustva {
         const yearsActive = new Date().getFullYear() - yearFounded;
 
         return `
-            <div class="col-md-4 mb-4" data-aos="fade-up">
+            <div class="col-md-4" data-aos="fade-up">
                 <div class="card h-100 bg-light hover-shadow">
                     <div class="card-header bg-primary text-white">
                         <h5 class="card-title mb-0">
@@ -126,8 +126,15 @@ class Drustva {
 
     renderDrustva(drustva) {
         if (!drustva.length) {
-            this.container.innerHTML =
-                '<div class="col-12"><p class="text-center">Ni najdenih društev.</p></div>';
+            this.container.innerHTML = `
+                <div class="col-12 py-6">
+                    <div class="empty-state">
+                        <i class="fas fa-search"></i>
+                        <h3>Ni najdenih društev</h3>
+                        <p>Poskusite z drugačnimi filtri ali iskalno besedo.</p>
+                    </div>
+                </div>
+            `;
             return;
         }
         this.container.innerHTML = drustva

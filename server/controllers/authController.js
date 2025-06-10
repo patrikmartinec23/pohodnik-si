@@ -1,63 +1,32 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { jwtSecret, jwtExpiry, cookieOptions } = require('../config/auth');
-const povezava = require('../config/db');
+const db = require('../config/db');
 
 async function login(req, res) {
-    console.log('=== LOGIN DEBUG ===');
-
-    // Handle both JSON body and form-urlencoded
-    const uporabniskoIme =
-        req.body?.uporabniskoIme ||
-        req.body?.username ||
-        req.headers?.uporabniskoime;
-    const geslo = req.body?.geslo || req.body?.password || req.headers?.geslo;
-
-    console.log('Login attempt with:', {
-        uporabniskoIme,
-        passwordProvided: !!geslo,
-    });
+    const uporabniskoIme = req.body?.uporabniskoIme || req.body?.username;
+    const geslo = req.body?.geslo || req.body?.password;
 
     if (!uporabniskoIme || !geslo) {
         return res.status(400).json({
             error: 'Vnesite uporabniško ime in geslo',
-            debug: {
-                contentType: req.headers['content-type'],
-                hasBody: !!req.body,
-                bodyKeys: req.body ? Object.keys(req.body) : [],
-            },
         });
     }
 
-    const connection = await povezava();
     try {
         // Get user with password hash
-        const [users] = await connection.query(
-            'SELECT IDUporabnik, UporabniskoIme, Geslo FROM Uporabnik WHERE UporabniskoIme = ?',
-            [uporabniskoIme]
-        );
+        const user = await db('Uporabnik')
+            .where('UporabniskoIme', uporabniskoIme)
+            .first();
 
-        console.log('Found users:', users.length);
-
-        if (users.length === 0) {
+        if (!user) {
             return res
                 .status(401)
                 .json({ error: 'Napačno uporabniško ime ali geslo' });
         }
 
-        const user = users[0];
-        console.log('User found:', {
-            id: user.IDUporabnik,
-            username: user.UporabniskoIme,
-            passwordHash: user.Geslo.substring(0, 10) + '...', // Show only part of hash for security
-        });
-
         // Compare password
         const isValid = await bcrypt.compare(geslo, user.Geslo);
-        console.log('Password validation:', {
-            providedPassword: geslo.substring(0, 3) + '...',
-            isValid: isValid,
-        });
 
         if (!isValid) {
             return res
@@ -75,7 +44,6 @@ async function login(req, res) {
             { expiresIn: jwtExpiry }
         );
 
-        // Set cookie and send response
         res.cookie('token', token, cookieOptions);
         res.json({
             success: true,
@@ -86,92 +54,61 @@ async function login(req, res) {
         });
     } catch (err) {
         console.error('Login error:', err);
-        res.status(500).json({
-            error: 'Napaka pri prijavi',
-            debug: err.message,
-        });
-    } finally {
-        await connection.end();
+        res.status(500).json({ error: 'Napaka pri prijavi' });
     }
 }
 
 async function register(req, res) {
-    console.log('Registration attempt:', req.body);
-
-    const {
-        uporabniskoIme,
-        geslo,
-        tip,
-        DrustvoIme,
-        Naslov,
-        LetoUstanovitve,
-        Predsednik,
-    } = req.body;
+    const { uporabniskoIme, geslo } = req.body;
 
     if (!uporabniskoIme || !geslo) {
-        return res.status(400).json({
-            error: 'Vnesite uporabniško ime in geslo',
-        });
+        return res
+            .status(400)
+            .json({ error: 'Vnesite uporabniško ime in geslo' });
     }
 
-    const connection = await povezava();
-
     try {
-        // Check if username already exists
-        const [existing] = await connection.query(
-            'SELECT * FROM Uporabnik WHERE UporabniskoIme = ?',
-            [uporabniskoIme]
-        );
+        // Check if username exists
+        const existingUser = await db('Uporabnik')
+            .where('UporabniskoIme', uporabniskoIme)
+            .first();
 
-        if (existing.length > 0) {
-            return res.status(400).json({
-                error: 'Uporabniško ime že obstaja',
-            });
+        if (existingUser) {
+            return res
+                .status(400)
+                .json({ error: 'Uporabniško ime že obstaja' });
         }
 
         // Hash password
         const hashedPassword = await bcrypt.hash(geslo, 10);
 
-        // Insert into Uporabnik
-        const [userResult] = await connection.query(
-            'INSERT INTO Uporabnik (UporabniskoIme, Geslo, Tip) VALUES (?, ?, ?)',
-            [uporabniskoIme, hashedPassword, tip]
-        );
+        // Insert user
+        const [userId] = await db('Uporabnik').insert({
+            UporabniskoIme: uporabniskoIme,
+            Geslo: hashedPassword,
+        });
 
-        const userId = userResult.insertId;
-
-        // If user is of type 'drustvo', insert society data
-        if (tip === 'drustvo') {
-            await connection.query(
-                'INSERT INTO PohodniskoDrustvo (DrustvoIme, Naslov, LetoUstanovitve, Predsednik, TK_Uporabnik) VALUES (?, ?, ?, ?, ?)',
-                [DrustvoIme, Naslov, LetoUstanovitve, Predsednik, userId]
-            );
-        }
-
-        // Create JWT token
+        // Create token
         const token = jwt.sign(
-            { id: userId, username: uporabniskoIme },
+            {
+                id: userId,
+                username: uporabniskoIme,
+            },
             jwtSecret,
             { expiresIn: jwtExpiry }
         );
 
-        // Set cookie and respond
         res.cookie('token', token, cookieOptions);
         res.json({
             success: true,
             user: {
                 id: userId,
                 username: uporabniskoIme,
-                tip: tip,
             },
         });
     } catch (err) {
         console.error('Registration error:', err);
-        res.status(500).json({
-            error: 'Napaka pri registraciji',
-        });
-    } finally {
-        await connection.end();
+        res.status(500).json({ error: 'Napaka pri registraciji' });
     }
 }
 

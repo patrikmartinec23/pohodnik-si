@@ -18,190 +18,141 @@
         <link rel="stylesheet" href="../css/styles.css" />
     </head>
     <body>
-        <div id="main-content">
-            <!-- Navigation -->
-            <div id="navbar" class="mb-7"></div>
+        <div id="navbar"></div>
 
-            <section id="pohodi" class="pohodi">
-                <div class="container">
-                    <div class="row mb-4">
-                        <div
-                            class="col-12 d-flex flex-column align-items-start"
-                        >
-                            <h2 class="fw-bold">Raziskuj med Pohodi</h2>
-                            <hr class="hr-heading-primary w-25" />
-                        </div>
-                    </div>
-                    <div class="row mb-4" data-aos="fade-down">
-                        <div class="col-md-4 mb-2">
-                            <input
-                                type="text"
-                                id="searchInput"
-                                class="form-control"
-                                placeholder="Išči pohode po imenu..."
-                            />
-                        </div>
-                        <div class="col-md-2 mb-2">
-                            <select id="tezavnostFilter" class="form-select">
-                                <option value="">Vse težavnosti</option>
-                                <option value="1">1/5</option>
-                                <option value="2">2/5</option>
-                                <option value="3">3/5</option>
-                                <option value="4">4/5</option>
-                                <option value="5">5/5</option>
-                            </select>
-                        </div>
-                        <div class="col-md-2 mb-2">
-                            <select id="lokacijaFilter" class="form-select">
-                                <option value="">Vse lokacije</option>
-                                <option value="Karavanke">Karavanke</option>
-                                <option value="Julijske Alpe">
-                                    Julijske Alpe
-                                </option>
-                                <option value="Kamniške Alpe">
-                                    Kamniške Alpe
-                                </option>
-                            </select>
-                        </div>
-                        <div class="col-md-2 mb-2">
-                            <select id="datumFilter" class="form-select">
-                                <option value="">Vsi datumi</option>
-                                <option value="2025-05-16">16.5.2025</option>
-                                <option value="2025-05-17">17.5.2025</option>
-                                <option value="2025-05-18">18.5.2025</option>
-                            </select>
-                        </div>
-                        <div class="col-md-2 mb-2">
-                            <button class="btn btn-secondary">Išči</button>
-                        </div>
-                    </div>
-
-                    <div
-                        class="row"
-                        data-aos="fade-up"
-                        data-aos-duration="300"
-                        data-aos-delay="200"
-                    >
-                        <div class="col-md-4 mb-4">
-                            <div class="card bg-light hover-shadow">
-                                <a href="pohod.html?id=1">
-                                    <img
-                                        src="../images/project-1.jpg"
-                                        alt="Project 1"
-                                        class="card-img-top"
+        <div class="container mt-5 py-5">
+            <div class="row mt-5">
+                <div class="col-12">
+                    <h2 class="fw-bold">Pohodi</h2>
+                    <hr class="hr-heading-primary w-25" />
+                </div>
+            </div>
+            <!-- Filter Section -->
+            <div class="row mb-4" data-aos="fade-down">
+                <div class="col-12">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3">Filtriraj pohode</h5>
+                            <div class="row g-3">
+                                <!-- Search -->
+                                <div class="col-md-4">
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        id="searchInput"
+                                        placeholder="Išči po imenu ali lokaciji..."
                                     />
-                                    <div class="card-body text-dark">
-                                        <div
-                                            class="d-flex justify-content-between align-items-start mb-2"
-                                        >
-                                            <h5 class="card-title mb-0">
-                                                <strong>Vzpon na Stol</strong>
-                                            </h5>
-                                            <span class="badge bg-primary">
-                                                <i
-                                                    class="fas fa-mountain me-1"
-                                                ></i
-                                                >2165m
-                                            </span>
-                                        </div>
-                                        <div class="d-flex gap-2 mb-3">
-                                            <span class="badge bg-success">
-                                                <i
-                                                    class="fas fa-hiking me-1"
-                                                ></i
-                                                >2/5
-                                            </span>
-                                            <span class="badge bg-info">
-                                                <i class="fas fa-clock me-1"></i
-                                                >6h
-                                            </span>
-                                            <span
-                                                class="badge bg-warning text-dark"
+                                </div>
+
+                                <!-- Difficulty -->
+                                <div class="col-md-2">
+                                    <select
+                                        class="form-select"
+                                        id="tezavnostFilter"
+                                    >
+                                        <option value="">Vse težavnosti</option>
+                                        <option value="1">1 - Lahko</option>
+                                        <option value="2">2 - Zmerno</option>
+                                        <option value="3">3 - Zahtevno</option>
+                                        <option value="4">
+                                            4 - Zelo zahtevno
+                                        </option>
+                                        <option value="5">5 - Ekstremno</option>
+                                    </select>
+                                </div>
+
+                                <!-- Location -->
+                                <div class="col-md-2">
+                                    <select
+                                        class="form-select"
+                                        id="lokacijaFilter"
+                                    >
+                                        <option value="">Vse lokacije</option>
+                                        <option value="Julijske Alpe">
+                                            Julijske Alpe
+                                        </option>
+                                        <option value="Kamniške Alpe">
+                                            Kamniške Alpe
+                                        </option>
+                                        <option value="Karavanke">
+                                            Karavanke
+                                        </option>
+                                        <option value="Pohorje">Pohorje</option>
+                                    </select>
+                                </div>
+
+                                <!-- Date Range -->
+                                <div class="col-md-2">
+                                    <input
+                                        type="date"
+                                        class="form-control"
+                                        id="datumOdFilter"
+                                        placeholder="Datum od"
+                                    />
+                                </div>
+                                <div class="col-md-2">
+                                    <input
+                                        type="date"
+                                        class="form-control"
+                                        id="datumDoFilter"
+                                        placeholder="Datum do"
+                                    />
+                                </div>
+
+                                <!-- Available Only -->
+                                <div class="col-12">
+                                    <div
+                                        class="d-flex align-items-center justify-content-between"
+                                    >
+                                        <div class="form-check">
+                                            <input
+                                                class="form-check-input"
+                                                type="checkbox"
+                                                id="availableOnlyFilter"
+                                            />
+                                            <label
+                                                class="form-check-label"
+                                                for="availableOnlyFilter"
                                             >
-                                                <i
-                                                    class="fas fa-map-marker-alt me-1"
-                                                ></i
-                                                >Karavanke
-                                            </span>
+                                                Prikaži samo pohode s prostimi
+                                                mesti
+                                            </label>
                                         </div>
-                                        <p class="card-text small mb-2">
-                                            Eden najlepših razgledov v
-                                            Karavankah
-                                        </p>
-                                        <div
-                                            class="d-flex justify-content-between align-items-center"
+                                        <button
+                                            id="resetFilters"
+                                            class="btn btn-secondary btn-sm"
                                         >
-                                            <small class="text-muted">
-                                                <i
-                                                    class="fas fa-calendar me-1"
-                                                ></i
-                                                >18. 5. 2025
-                                            </small>
-                                            <small class="text-primary">
-                                                <i class="fas fa-users me-1"></i
-                                                >Društvo Trail
-                                            </small>
-                                        </div>
+                                            <i
+                                                class="fas fa-undo me-2 d-none d-md-inline-block"
+                                            ></i
+                                            >Ponastavi
+                                        </button>
                                     </div>
-                                </a>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </section>
+            </div>
+
+            <!-- Pohodi Cards -->
+            <div class="row" data-aos="fade-up">
+                <!-- Cards will be inserted here by JavaScript -->
+            </div>
         </div>
 
-        <!-- Footer -->
         <div id="footer"></div>
 
+        <!-- Scripts -->
         <script src="../utils/Auth.js"></script>
         <script src="../components/Navbar.js"></script>
         <script src="../components/Footer.js"></script>
-        <script src="../js/bootstrap.bundle.min.js"></script>
         <script src="../components/Pohodi.js"></script>
         <script src="../js/script.js"></script>
-
+        <script src="../js/bootstrap.bundle.min.js"></script>
         <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
         <script>
             AOS.init();
         </script>
     </body>
 </html>
-
-<!-- TUKAJ JE SKRIPTA KAK BI MOGLO ZGLEDAT ZA SEARCH
-<script>
-  AOS.init({ duration: 1000, once: true });
-
-  // Filter funkcionalnost
-  const searchInput = document.getElementById('searchInput');
-  const difficultyFilter = document.getElementById('difficultyFilter');
-  const regionFilter = document.getElementById('regionFilter');
-  const hikes = document.querySelectorAll('.hike');
-
-  function filterHikes() {
-    const searchTerm = searchInput.value.toLowerCase();
-    const selectedDifficulty = difficultyFilter.value;
-    const selectedRegion = regionFilter.value;
-
-    hikes.forEach(hike => {
-      const title = hike.querySelector('.card-title').textContent.toLowerCase();
-      const difficulty = hike.getAttribute('data-difficulty');
-      const region = hike.getAttribute('data-region');
-
-      const matchesSearch = title.includes(searchTerm);
-      const matchesDifficulty = !selectedDifficulty || difficulty === selectedDifficulty;
-      const matchesRegion = !selectedRegion || region === selectedRegion;
-
-      if (matchesSearch && matchesDifficulty && matchesRegion) {
-        hike.style.display = '';
-      } else {
-        hike.style.display = 'none';
-      }
-    });
-  }
-
-  searchInput.addEventListener('input', filterHikes);
-  difficultyFilter.addEventListener('change', filterHikes);
-  regionFilter.addEventListener('change', filterHikes);
-</script>
--->
