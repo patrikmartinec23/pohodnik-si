@@ -7,7 +7,7 @@ class Pohodi {
             location: document.getElementById('lokacijaFilter'),
             date: document.getElementById('datumFilter'),
         };
-        this.pohodi = []; // Store pohodi data
+        this.pohodi = [];
         this.init();
     }
 

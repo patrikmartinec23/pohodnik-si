@@ -98,7 +98,15 @@ async function login(req, res) {
 async function register(req, res) {
     console.log('Registration attempt:', req.body);
 
-    const { uporabniskoIme, geslo, tip } = req.body;
+    const {
+        uporabniskoIme,
+        geslo,
+        tip,
+        DrustvoIme,
+        Naslov,
+        LetoUstanovitve,
+        Predsednik,
+    } = req.body;
 
     if (!uporabniskoIme || !geslo) {
         return res.status(400).json({
@@ -124,13 +132,21 @@ async function register(req, res) {
         // Hash password
         const hashedPassword = await bcrypt.hash(geslo, 10);
 
-        // Insert new user
-        const [result] = await connection.query(
-            'INSERT INTO Uporabnik (UporabniskoIme, Geslo) VALUES (?, ?)',
-            [uporabniskoIme, hashedPassword]
+        // Insert into Uporabnik
+        const [userResult] = await connection.query(
+            'INSERT INTO Uporabnik (UporabniskoIme, Geslo, Tip) VALUES (?, ?, ?)',
+            [uporabniskoIme, hashedPassword, tip]
         );
 
-        const userId = result.insertId;
+        const userId = userResult.insertId;
+
+        // If user is of type 'drustvo', insert society data
+        if (tip === 'drustvo') {
+            await connection.query(
+                'INSERT INTO PohodniskoDrustvo (DrustvoIme, Naslov, LetoUstanovitve, Predsednik, TK_Uporabnik) VALUES (?, ?, ?, ?, ?)',
+                [DrustvoIme, Naslov, LetoUstanovitve, Predsednik, userId]
+            );
+        }
 
         // Create JWT token
         const token = jwt.sign(
@@ -139,13 +155,14 @@ async function register(req, res) {
             { expiresIn: jwtExpiry }
         );
 
-        // Set cookie and send response
+        // Set cookie and respond
         res.cookie('token', token, cookieOptions);
         res.json({
             success: true,
             user: {
                 id: userId,
                 username: uporabniskoIme,
+                tip: tip,
             },
         });
     } catch (err) {

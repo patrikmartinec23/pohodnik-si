@@ -7,6 +7,7 @@ const Pohod = require('./server/models/Pohod');
 const povezava = require('./server/config/db');
 const authRoutes = require('./server/routes/authRoutes');
 const pohodiRoutes = require('./server/routes/pohodiRoutes.js');
+const drustvaRoutes = require('./server/routes/drustvaRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -21,6 +22,7 @@ app.use(express.static(path.join(__dirname, 'public/pages')));
 // ROUTES - AFTER MIDDLEWARE
 app.use(authRoutes);
 app.use(pohodiRoutes);
+app.use(drustvaRoutes);
 
 // Start server
 app.listen(PORT, () => {

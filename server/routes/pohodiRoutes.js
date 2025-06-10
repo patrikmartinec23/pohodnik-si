@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const povezava = require('../config/db');
 
-// Route to get all pohodi
+// Get all pohodi
 router.get('/api/pohodi', async (req, res) => {
     const connection = await povezava();
     try {

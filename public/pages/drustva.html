@@ -4,159 +4,67 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>Društva – Pohodnik.si</title>
-
         <link
             href="https://unpkg.com/aos@2.3.1/dist/aos.css"
             rel="stylesheet"
-        />
-        <link
-            rel="stylesheet"
-            type="text/css"
-            href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css"
         />
         <link rel="stylesheet" href="../css/fontawesome.css" />
         <link rel="stylesheet" href="../css/bootstrap.css" />
         <link rel="stylesheet" href="../css/styles.css" />
     </head>
     <body>
-        <!-- Navigation -->
         <div id="navbar"></div>
 
-        <div class="container">
-            <h2 class="section-title">Pohodniška društva</h2>
-
-            <div class="row mb-4" data-aos="fade-down">
-                <div class="col-md-6 mb-2">
-                    <input
-                        type="text"
-                        id="searchInput"
-                        class="form-control"
-                        placeholder="Išči društva po imenu..."
-                    />
-                </div>
-                <div class="col-md-6 mb-2">
-                    <select id="regionFilter" class="form-select">
-                        <option value="">Vse regije</option>
-                        <option value="gorenjska">Gorenjska</option>
-                        <option value="primorska">Primorska</option>
-                        <option value="stajerska">Štajerska</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="row" id="clubList">
-                <div
-                    class="col-md-4 mb-4 club"
-                    data-aos="fade-up"
-                    data-region="gorenjska"
-                >
-                    <div class="card h-100">
-                        <img
-                            src="slike/index-1.jpg"
-                            class="card-img-top"
-                            alt="PD Gorenjska"
-                        />
-                        <div class="card-body">
-                            <h5 class="card-title">PD Triglav</h5>
-                            <p class="card-text">
-                                Ena najbolj aktivnih društev na Gorenjskem.
-                                Organizirajo redne pohode in tabore.
-                            </p>
-                            <a href="#" class="btn btn-success">Pridruži se</a>
+        <div id="main-content" class="mt-6">
+            <section class="drustva py-5">
+                <div class="container">
+                    <div class="row mb-4">
+                        <div
+                            class="col-12 d-flex flex-column align-items-start"
+                        >
+                            <h2 class="fw-bold">Pohodniška društva</h2>
+                            <hr class="hr-heading-primary w-25" />
                         </div>
                     </div>
-                </div>
 
-                <div
-                    class="col-md-4 mb-4 club"
-                    data-aos="fade-up"
-                    data-aos-delay="100"
-                    data-region="stajerska"
-                >
-                    <div class="card h-100">
-                        <img
-                            src="slike/index-1.jpg"
-                            class="card-img-top"
-                            alt="PD Štajerska"
-                        />
-                        <div class="card-body">
-                            <h5 class="card-title">PD Maribor</h5>
-                            <p class="card-text">
-                                Organizatorji mestnih in gorskih pohodov.
-                                Aktivni tudi na področju varstva narave.
-                            </p>
-                            <a href="#" class="btn btn-success">Pridruži se</a>
+                    <div class="row mb-4" data-aos="fade-down">
+                        <div class="col-md-8 mb-2">
+                            <input
+                                type="text"
+                                id="searchInput"
+                                class="form-control"
+                                placeholder="Išči društva po imenu..."
+                            />
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <select id="regionFilter" class="form-select">
+                                <option value="">Vse regije</option>
+                                <option value="gorenjska">Gorenjska</option>
+                                <option value="primorska">Primorska</option>
+                                <option value="štajerska">Štajerska</option>
+                                <option value="dolenjska">Dolenjska</option>
+                            </select>
                         </div>
                     </div>
-                </div>
 
-                <div
-                    class="col-md-4 mb-4 club"
-                    data-aos="fade-up"
-                    data-aos-delay="200"
-                    data-region="primorska"
-                >
-                    <div class="card h-100">
-                        <img
-                            src="slike/index-1.jpg"
-                            class="card-img-top"
-                            alt="PD Primorska"
-                        />
-                        <div class="card-body">
-                            <h5 class="card-title">PD Koper</h5>
-                            <p class="card-text">
-                                Pohodi v okolici Trsta, Obale in Krasa. Poudarek
-                                na kulturno-naravni dediščini.
-                            </p>
-                            <a href="#" class="btn btn-success">Pridruži se</a>
-                        </div>
+                    <div class="row" id="clubList">
+                        <!-- Društva will be loaded here dynamically -->
                     </div>
                 </div>
-            </div>
+            </section>
         </div>
 
-        <!-- Footer -->
         <div id="footer"></div>
 
+        <script src="../utils/Auth.js"></script>
         <script src="../components/Navbar.js"></script>
         <script src="../components/Footer.js"></script>
-        <script src="js/replaceme.min.js"></script>
-        <script src="../js/bootstrap.bundle.min.js"></script>
+        <script src="../components/Drustva.js"></script>
         <script src="../js/script.js"></script>
+        <script src="../js/bootstrap.bundle.min.js"></script>
         <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
         <script>
             AOS.init();
-        </script>
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                AOS.init({ duration: 1000, once: true });
-
-                const searchInput = document.getElementById('searchInput');
-                const regionFilter = document.getElementById('regionFilter');
-                const clubs = document.querySelectorAll('.club');
-
-                function filterClubs() {
-                    const searchTerm = searchInput.value.toLowerCase();
-                    const selectedRegion = regionFilter.value;
-
-                    clubs.forEach((club) => {
-                        const title = club
-                            .querySelector('.card-title')
-                            .textContent.toLowerCase();
-                        const region = club.getAttribute('data-region');
-
-                        const matchesSearch = title.includes(searchTerm);
-                        const matchesRegion =
-                            !selectedRegion || region === selectedRegion;
-
-                        club.style.display =
-                            matchesSearch && matchesRegion ? '' : 'none';
-                    });
-                }
-
-                searchInput.addEventListener('input', filterClubs);
-                regionFilter.addEventListener('change', filterClubs);
-            });
         </script>
     </body>
 </html>

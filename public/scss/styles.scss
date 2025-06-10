@@ -272,6 +272,35 @@ h5 .badge {
     opacity: 1;
 }
 
+.drustva .card {
+    transition: transform 0.2s ease-in-out;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.drustva .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.drustva .card-header {
+    border-bottom: none;
+    padding: 1rem;
+}
+
+.drustva .badge {
+    font-size: 0.85rem;
+    padding: 0.5rem 0.75rem;
+}
+
+.drustva .hover-shadow {
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+.drustva .hover-shadow:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
 /* Pohod Detail Page Styles */
 .pohod-detail {
     padding-top: 2rem;
