@@ -82,4 +82,31 @@ router.delete('/api/pohodi/:id', async (req, res) => {
     }
 });
 
+// Get comments for a pohod
+router.get('/api/pohodi/:id/comments', async (req, res) => {
+    try {
+        const comments = await Pohod.getComments(req.params.id);
+        res.json({ comments });
+    } catch (error) {
+        console.error('Error fetching comments:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// Add new comment
+router.post('/api/pohodi/:id/comments', async (req, res) => {
+    try {
+        const id = await Pohod.addComment(
+            req.params.id,
+            req.body.userId,
+            req.body.content,
+            req.body.rating
+        );
+        res.status(201).json({ id });
+    } catch (error) {
+        console.error('Error creating comment:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
 module.exports = router;

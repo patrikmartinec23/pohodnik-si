@@ -298,6 +298,115 @@ h5 .badge {
     }
 }
 
+.rating {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    
+    input {
+        display: none;
+        
+        &:checked ~ label {
+            color: #ffc107;
+        }
+    }
+    
+    label {
+        color: #ddd;
+        cursor: pointer;
+        padding: 0 0.2em;
+        font-size: 1.5em;
+        
+        &:hover,
+        &:hover ~ label {
+            color: #ffc107;
+        }
+    }
+}
+
+.comment {
+    .rating-display {
+        color: #ffc107;
+        font-size: 0.9em;
+    }
+}
+
+/* Map container fixes */
+.map-container {
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+}
+
+#map {
+    height: 400px !important;
+    width: 100% !important;
+    z-index: 1;
+    position: relative;
+}
+
+/* Ensure Leaflet controls don't overflow */
+.leaflet-container {
+    font-family: inherit;
+}
+
+.leaflet-control-container {
+    position: relative;
+}
+
+/* Fix for Bootstrap card overflow issues */
+.card-body .map-container {
+    margin: 0;
+    max-width: 100%;
+}
+
+/* Responsive map adjustments */
+@media (max-width: 768px) {
+    #map {
+        height: 300px !important;
+    }
+}
+
+/* Additional container constraints */
+.additional-info .container {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+    textarea {
+
+        resize: none;
+    }
+
+.additional-info .row {
+    margin: 0;
+}
+
+.additional-info .col-lg-6 {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.upcoming-hikes {
+    .row {
+        --bs-gutter-x: 1.5rem;
+        --bs-gutter-y: 1.5rem;
+    }
+
+    .col-md-6 {
+        @media (min-width: 768px) and (max-width: 991px) {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+        
+        @media (min-width: 992px) {
+            flex: 0 0 50%;
+            max-width: 50%;
+        }
+    }
+}
+
 .empty-state {
     text-align: center;
     padding: 4rem 2rem;

@@ -37,7 +37,14 @@ router.put('/api/users/:id', auth, async (req, res) => {
 // Get upcoming hikes for user
 router.get('/api/users/:id/upcoming-hikes', auth, async (req, res) => {
     try {
-        const hikes = await Profile.getUpcomingHikes(req.params.id);
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 2;
+
+        const hikes = await Profile.getUpcomingHikes(
+            req.params.id,
+            page,
+            limit
+        );
         res.json(hikes);
     } catch (error) {
         console.error('Error fetching upcoming hikes:', error);

@@ -46,7 +46,7 @@ class Profile {
         }
     }
 
-    static async getUpcomingHikes(userId) {
+    static async getUpcomingHikes(userId, page = 1, limit = 2) {
         try {
             const pohodnik = await db('Pohodnik')
                 .where('TK_Uporabnik', userId)
@@ -54,12 +54,21 @@ class Profile {
                 .first();
 
             if (!pohodnik) {
-                return [];
+                return { hikes: [], total: 0 };
             }
 
             const today = new Date().toISOString().split('T')[0];
+            const offset = (page - 1) * limit;
 
-            return await db('Prijava as pr')
+            // Get total count
+            const [{ total }] = await db('Prijava as pr')
+                .join('Pohod as p', 'pr.TK_Pohod', 'p.IDPohod')
+                .where('pr.TK_Pohodnik', pohodnik.IDPohodnik)
+                .where('p.DatumPohoda', '>=', today)
+                .count('* as total');
+
+            // Get paginated hikes
+            const hikes = await db('Prijava as pr')
                 .join('Pohod as p', 'pr.TK_Pohod', 'p.IDPohod')
                 .leftJoin(
                     'PohodniskoDrustvo as pd',
@@ -82,7 +91,11 @@ class Profile {
                 )
                 .where('pr.TK_Pohodnik', pohodnik.IDPohodnik)
                 .where('p.DatumPohoda', '>=', today)
-                .orderBy('p.DatumPohoda', 'asc');
+                .orderBy('p.DatumPohoda', 'asc')
+                .limit(limit)
+                .offset(offset);
+
+            return { hikes, total };
         } catch (error) {
             console.error('Error in getUpcomingHikes:', error);
             throw error;

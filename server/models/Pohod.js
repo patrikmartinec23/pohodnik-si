@@ -179,6 +179,49 @@ class Pohod {
         }
     }
 
+    static async getComments(pohodId) {
+        try {
+            return await db('Komentar as k')
+                .join('Pohodnik as p', 'k.TK_Pohodnik', 'p.IDPohodnik')
+                .join('Uporabnik as u', 'p.TK_Uporabnik', 'u.IDUporabnik')
+                .where('k.TK_Pohod', pohodId)
+                .select(
+                    'k.IDKomentar',
+                    'k.Komentar as content',
+                    'k.Ocena as rating',
+                    'u.UporabniskoIme as username' // Changed to match your schema
+                )
+                .orderBy('k.IDKomentar', 'desc');
+        } catch (error) {
+            console.error('Error in getComments:', error);
+            throw error;
+        }
+    }
+
+    static async addComment(pohodId, userId, content, rating) {
+        try {
+            const pohodnik = await db('Pohodnik')
+                .where('TK_Uporabnik', userId)
+                .first();
+
+            if (!pohodnik) {
+                throw new Error('Pohodnik not found');
+            }
+
+            const [id] = await db('Komentar').insert({
+                TK_Pohod: pohodId,
+                TK_Pohodnik: pohodnik.IDPohodnik,
+                Komentar: content,
+                Ocena: rating || 5,
+            });
+
+            return id;
+        } catch (error) {
+            console.error('Error in addComment:', error);
+            throw error;
+        }
+    }
+
     // Additional helper methods
     static async getByDrustvo(drustvoId) {
         try {

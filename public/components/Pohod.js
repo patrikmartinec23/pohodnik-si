@@ -1,6 +1,7 @@
 class Pohod {
     constructor() {
         this.container = document.getElementById('main-content');
+        this.map = null; // Initialize map property
         this.init();
     }
 
@@ -58,7 +59,7 @@ class Pohod {
             </a>`;
 
         this.container.innerHTML = `
-            <section class="pohod-detail">
+            <section class="pohod-detail mb-4">
                 <div class="container">
                     <!-- Header Section -->
                     <div class="row mb-4">
@@ -147,7 +148,7 @@ class Pohod {
                                     <ul class="list-unstyled">
                                         <li class="mb-3 d-flex justify-content-between">
                                             <span class="text-muted">
-                                                <i class="fas fa-calendar me-2"></i>Datum in ura
+                                                <i class="fas fa-calendar me-2"></i>Datum
                                             </span>
                                             <strong>${date}</strong>
                                         </li>
@@ -233,7 +234,234 @@ class Pohod {
                     </div>
                 </div>
             </section>
+        <section class="additional-info py-5 bg-light">
+                <div class="container">
+                    <div class="row">
+                        <!-- Map Column -->
+                        <div class="col-lg-6 mb-4">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-body">
+                                    <h3 class="h4 mb-4">
+                                        <i class="fas fa-map-location-dot me-2  text-primary"></i>Lokacija
+                                    </h3>
+                                    <div class="map-container" style="position: relative; overflow: hidden; border-radius: 8px;">
+                                        <div id="map" style="height: 400px; width: 100%; z-index: 1;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Comments Column -->
+                        <div class="col-lg-6 mb-4">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-body">
+                                    <h3 class="h4 mb-3">
+                                        <i class="fas fa-comments me-2  text-primary mb-3"></i>Komentarji
+                                    </h3>                 
+                                    <div id="commentsList" class="mt-4">
+                                        <!-- Comments will be loaded here -->
+                                    </div>
+                                    ${
+                                        Auth.getUser()
+                                            ? `
+        <form id="commentForm" class="mb-4">
+            <div class="mb-3 mt-5">
+                <label class="form-label">Ocena</label>
+                <div class="rating mb-2">
+                    ${[5, 4, 3, 2, 1]
+                        .map(
+                            (num) => `
+                        <input type="radio" name="rating" value="${num}" id="star${num}" ${
+                                num === 5 ? 'checked' : ''
+                            }>
+                        <label for="star${num}"><i class="fas fa-star"></i></label>
+                    `
+                        )
+                        .join('')}
+                </div>
+                <textarea class="form-control" 
+                          name="content"
+                          rows="3" 
+                          placeholder="Napiši komentar..."
+                          required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-paper-plane me-2"></i>Oddaj
+            </button>
+        </form>
+    `
+                                            : `
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>
+            Za oddajo komentarja se morate <a href="prijava.html">prijaviti</a>.
+        </div>
+    `
+                                    }              
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
         `;
+
+        // Initialize map after DOM is ready
+        setTimeout(() => {
+            this.initializeMap(pohod.Lokacija);
+        }, 100);
+
+        this.loadComments(pohod.IDPohod);
+    }
+
+    async initializeMap(location) {
+        try {
+            // Clean up existing map if it exists
+            if (this.map) {
+                this.map.remove();
+                this.map = null;
+            }
+
+            // Wait for the map element to be available in DOM
+            const mapElement = document.getElementById('map');
+            if (!mapElement) {
+                console.error('Map element not found');
+                return;
+            }
+
+            // Initialize the map
+            this.map = L.map('map', {
+                zoomControl: true,
+                scrollWheelZoom: true,
+                dragging: true,
+                tap: true,
+                touchZoom: true,
+            }).setView([46.1512, 14.9955], 8);
+
+            // Add OpenStreetMap tiles
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '© OpenStreetMap contributors',
+            }).addTo(this.map);
+
+            // Force map to invalidate size after a short delay
+            setTimeout(() => {
+                if (this.map) {
+                    this.map.invalidateSize();
+                }
+            }, 200);
+
+            // Geocode the location
+            try {
+                const response = await fetch(
+                    `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+                        location
+                    )}, Slovenia&limit=1`
+                );
+                const data = await response.json();
+
+                if (data && data.length > 0) {
+                    const { lat, lon } = data[0];
+                    this.map.setView([lat, lon], 13);
+                    L.marker([lat, lon])
+                        .addTo(this.map)
+                        .bindPopup(`<strong>${location}</strong>`)
+                        .openPopup();
+
+                    // Invalidate size again after setting view
+                    setTimeout(() => {
+                        if (this.map) {
+                            this.map.invalidateSize();
+                        }
+                    }, 100);
+                } else {
+                    console.warn('Location not found:', location);
+                }
+            } catch (geocodeError) {
+                console.error('Error geocoding location:', geocodeError);
+            }
+        } catch (error) {
+            console.error('Error initializing map:', error);
+            // Show fallback content
+            const mapElement = document.getElementById('map');
+            if (mapElement) {
+                mapElement.innerHTML = `
+                    <div class="d-flex align-items-center justify-content-center h-100 bg-light text-muted">
+                        <div class="text-center">
+                            <i class="fas fa-map fa-3x mb-3"></i>
+                            <p>Zemljevid ni na voljo</p>
+                            <small>${location}</small>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+    }
+
+    async loadComments(pohodId) {
+        try {
+            const response = await fetch(`/api/pohodi/${pohodId}/comments`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            const comments = data.comments || []; // Extract comments array
+
+            const commentsList = document.getElementById('commentsList');
+            if (!commentsList) {
+                console.error('Comments list element not found');
+                return;
+            }
+
+            if (!comments.length) {
+                commentsList.innerHTML = `
+                <div class="text-center text-muted py-4">
+                    <i class="fas fa-comments fa-2x mb-3 d-block"></i>
+                    <p class="mb-0">Še ni komentarjev. Bodite prvi!</p>
+                </div>`;
+                return;
+            }
+
+            commentsList.innerHTML = comments
+                .map(
+                    (comment) => `
+                <div class="comment mb-3 pb-3 border-bottom">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-user-circle fa-2x text-primary me-2"></i>
+                            <div>
+                                <h6 class="mb-0">${comment.username}</h6>
+                            </div>
+                        </div>
+                        <div class="rating-display">
+                            ${Array(5)
+                                .fill(0)
+                                .map(
+                                    (_, i) =>
+                                        `<i class="fas fa-star ${
+                                            i < comment.rating
+                                                ? 'text-warning'
+                                                : 'text-muted'
+                                        }"></i>`
+                                )
+                                .join('')}
+                        </div>
+                    </div>
+                    <p class="mb-0">${comment.content}</p>
+                </div>
+            `
+                )
+                .join('');
+        } catch (error) {
+            console.error('Error loading comments:', error);
+            const commentsList = document.getElementById('commentsList');
+            if (commentsList) {
+                commentsList.innerHTML = `
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Napaka pri nalaganju komentarjev
+                </div>`;
+            }
+        }
     }
 
     showError(message) {
@@ -248,7 +476,24 @@ class Pohod {
             </div>
         `;
     }
+
+    // Cleanup method to be called when leaving the page
+    destroy() {
+        if (this.map) {
+            this.map.remove();
+            this.map = null;
+        }
+    }
 }
 
 // Initialize when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => new Pohod());
+document.addEventListener('DOMContentLoaded', () => {
+    window.pohodInstance = new Pohod();
+});
+
+// Cleanup when leaving the page
+window.addEventListener('beforeunload', () => {
+    if (window.pohodInstance && window.pohodInstance.destroy) {
+        window.pohodInstance.destroy();
+    }
+});
