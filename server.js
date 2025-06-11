@@ -2,12 +2,11 @@ const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
-const bcrypt = require('bcryptjs'); // Add this for password hashing
-const Pohod = require('./server/models/Pohod');
 const povezava = require('./server/config/db');
 const authRoutes = require('./server/routes/authRoutes');
 const pohodiRoutes = require('./server/routes/pohodiRoutes.js');
 const drustvaRoutes = require('./server/routes/drustvaRoutes');
+const profileRoutes = require('./server/routes/profileRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -23,6 +22,7 @@ app.use(express.static(path.join(__dirname, 'public/pages')));
 app.use(authRoutes);
 app.use(pohodiRoutes);
 app.use(drustvaRoutes);
+app.use(profileRoutes);
 
 // Start server
 app.listen(PORT, () => {

@@ -10,7 +10,6 @@ class RegisterPohodnik {
             window.location.href = '/pages/pohodi.html';
             return;
         }
-
         this.setupEventListeners();
     }
 
@@ -22,20 +21,22 @@ class RegisterPohodnik {
     }
 
     async handleRegistration() {
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
-        const confirmPassword =
-            document.getElementById('confirmPassword').value;
+        const formData = {
+            uporabniskoIme: document.getElementById('username').value,
+            geslo: document.getElementById('password').value,
+            confirmPassword: document.getElementById('confirmPassword').value,
+            ime: document.getElementById('ime').value,
+            priimek: document.getElementById('priimek').value,
+            datumRojstva: document.getElementById('datumRojstva').value,
+            prebivalisce: document.getElementById('prebivalisce').value,
+        };
 
-        if (!this.validateInputs(password, confirmPassword)) {
+        if (!this.validateInputs(formData)) {
             return;
         }
 
         try {
-            const result = await Auth.register({
-                uporabniskoIme: username,
-                geslo: password,
-            });
+            const result = await Auth.register(formData);
 
             if (result.success) {
                 window.location.href = '/pages/pohodi.html';
@@ -48,8 +49,8 @@ class RegisterPohodnik {
         }
     }
 
-    validateInputs(password, confirmPassword) {
-        if (password !== confirmPassword) {
+    validateInputs(data) {
+        if (data.geslo !== data.confirmPassword) {
             this.showError('Gesli se ne ujemata');
             return false;
         }
@@ -58,9 +59,8 @@ class RegisterPohodnik {
 
     showError(message) {
         this.errorElement.textContent = message;
-        this.errorElement.style.display = 'block';
+        this.errorElement.classList.remove('d-none');
     }
 }
 
-// Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => new RegisterPohodnik());

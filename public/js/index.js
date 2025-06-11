@@ -74,7 +74,7 @@ function incrementStats(counter) {
 
     const updateCounter = () => {
         const c = +counter.innerText;
-        const increment = target / 1000;
+        const increment = target / 350;
 
         if (c < target) {
             counter.innerText = Math.ceil(c + increment);

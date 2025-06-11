@@ -59,53 +59,80 @@ async function login(req, res) {
 }
 
 async function register(req, res) {
-    const { uporabniskoIme, geslo } = req.body;
+    const { uporabniskoIme, geslo, ime, priimek, datumRojstva, prebivalisce } =
+        req.body;
 
-    if (!uporabniskoIme || !geslo) {
-        return res
-            .status(400)
-            .json({ error: 'Vnesite uporabniško ime in geslo' });
+    if (
+        !uporabniskoIme ||
+        !geslo ||
+        !ime ||
+        !priimek ||
+        !datumRojstva ||
+        !prebivalisce
+    ) {
+        return res.status(400).json({ error: 'Izpolnite vsa polja' });
     }
 
     try {
-        // Check if username exists
-        const existingUser = await db('Uporabnik')
-            .where('UporabniskoIme', uporabniskoIme)
-            .first();
+        // Start transaction
+        const trx = await db.transaction();
 
-        if (existingUser) {
-            return res
-                .status(400)
-                .json({ error: 'Uporabniško ime že obstaja' });
+        try {
+            // Check if username exists
+            const existingUser = await trx('Uporabnik')
+                .where('UporabniskoIme', uporabniskoIme)
+                .first();
+
+            if (existingUser) {
+                await trx.rollback();
+                return res
+                    .status(400)
+                    .json({ error: 'Uporabniško ime že obstaja' });
+            }
+
+            // Hash password
+            const hashedPassword = await bcrypt.hash(geslo, 10);
+
+            // Insert user
+            const [userId] = await trx('Uporabnik').insert({
+                UporabniskoIme: uporabniskoIme,
+                Geslo: hashedPassword,
+            });
+
+            // Insert pohodnik
+            await trx('Pohodnik').insert({
+                Ime: ime,
+                Priimek: priimek,
+                DatumRojstva: datumRojstva,
+                Prebivalisce: prebivalisce,
+                TK_Uporabnik: userId,
+            });
+
+            // Create token
+            const token = jwt.sign(
+                {
+                    id: userId,
+                    username: uporabniskoIme,
+                },
+                jwtSecret,
+                { expiresIn: jwtExpiry }
+            );
+
+            // Commit transaction
+            await trx.commit();
+
+            res.cookie('token', token, cookieOptions);
+            res.json({
+                success: true,
+                user: {
+                    id: userId,
+                    username: uporabniskoIme,
+                },
+            });
+        } catch (err) {
+            await trx.rollback();
+            throw err;
         }
-
-        // Hash password
-        const hashedPassword = await bcrypt.hash(geslo, 10);
-
-        // Insert user
-        const [userId] = await db('Uporabnik').insert({
-            UporabniskoIme: uporabniskoIme,
-            Geslo: hashedPassword,
-        });
-
-        // Create token
-        const token = jwt.sign(
-            {
-                id: userId,
-                username: uporabniskoIme,
-            },
-            jwtSecret,
-            { expiresIn: jwtExpiry }
-        );
-
-        res.cookie('token', token, cookieOptions);
-        res.json({
-            success: true,
-            user: {
-                id: userId,
-                username: uporabniskoIme,
-            },
-        });
     } catch (err) {
         console.error('Registration error:', err);
         res.status(500).json({ error: 'Napaka pri registraciji' });

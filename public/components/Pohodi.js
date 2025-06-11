@@ -176,7 +176,6 @@ class Pohodi {
     }
 
     resetFilters() {
-        // Reset all filter values
         this.filters.search.value = '';
         this.filters.difficulty.value = '';
         this.filters.location.value = '';
@@ -184,7 +183,6 @@ class Pohodi {
         this.filters.dateTo.value = '';
         this.filters.availableOnly.checked = false;
 
-        // Reload pohodi with no filters
         this.loadPohodi();
     }
 
@@ -219,5 +217,4 @@ function debounce(func, wait) {
     };
 }
 
-// Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => new Pohodi());

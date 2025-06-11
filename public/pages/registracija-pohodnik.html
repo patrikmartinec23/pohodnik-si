@@ -13,18 +13,12 @@
         <link rel="stylesheet" href="../css/styles.css" />
         <style>
             .login-container {
-                max-width: 400px;
+                max-width: 800px;
                 margin: 90px auto;
                 background: white;
-                padding: 30px;
+                padding: 2rem;
                 border-radius: 10px;
                 box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            }
-            .error-message {
-                color: #dc3545;
-                font-size: 0.875rem;
-                margin-top: 0.5rem;
-                display: none;
             }
         </style>
     </head>
@@ -32,15 +26,21 @@
         <div id="navbar"></div>
 
         <div
-            class="login-container mt-8"
+            class="login-container mt-7"
             data-aos="fade-up"
             data-aos-delay="200"
         >
-            <img src="../images/logo.png" alt="Pohodnik.si" class="logo" />
-            <h4 class="text-center mb-3">Registracija Pohodnika</h4>
+            <div class="text-center mb-4">
+                <img
+                    src="../images/logo.png"
+                    alt="Pohodnik.si"
+                    class="logo mb-3 w-25"
+                />
+                <h4>Registracija Pohodnika</h4>
+            </div>
 
             <div class="text-center mb-4">
-                <p>Ste predstavnik pohodniškega društva?</p>
+                <p class="mb-2">Ste predstavnik pohodniškega društva?</p>
                 <a
                     href="registracija-drustvo.html"
                     class="btn btn-outline-primary"
@@ -49,47 +49,101 @@
                 </a>
             </div>
 
-            <form id="registerForm">
-                <div class="mb-3">
-                    <label for="username" class="form-label"
-                        >Uporabniško ime</label
-                    >
-                    <input
-                        type="text"
-                        class="form-control"
-                        id="username"
-                        required
-                    />
-                </div>
+            <form id="registerForm" class="needs-validation" novalidate>
+                <div class="row g-3">
+                    <!-- Account Details -->
+                    <div class="col-12">
+                        <h5 class="border-bottom pb-2">Podatki za prijavo</h5>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="username" class="form-label"
+                            >Uporabniško ime</label
+                        >
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="username"
+                            required
+                        />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="password" class="form-label">Geslo</label>
+                        <input
+                            type="password"
+                            class="form-control"
+                            id="password"
+                            required
+                        />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="confirmPassword" class="form-label"
+                            >Potrdi geslo</label
+                        >
+                        <input
+                            type="password"
+                            class="form-control"
+                            id="confirmPassword"
+                            required
+                        />
+                    </div>
 
-                <div class="mb-3">
-                    <label for="password" class="form-label">Geslo</label>
-                    <input
-                        type="password"
-                        class="form-control"
-                        id="password"
-                        required
-                    />
-                </div>
+                    <!-- Personal Information -->
+                    <div class="col-12">
+                        <h5 class="border-bottom pb-2 mt-3">Osebni podatki</h5>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="ime" class="form-label">Ime</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="ime"
+                            required
+                        />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="priimek" class="form-label">Priimek</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="priimek"
+                            required
+                        />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="datumRojstva" class="form-label"
+                            >Datum rojstva</label
+                        >
+                        <input
+                            type="date"
+                            class="form-control"
+                            id="datumRojstva"
+                            required
+                        />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="prebivalisce" class="form-label"
+                            >Prebivališče</label
+                        >
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="prebivalisce"
+                            required
+                        />
+                    </div>
 
-                <div class="mb-3">
-                    <label for="confirmPassword" class="form-label"
-                        >Potrdi geslo</label
-                    >
-                    <input
-                        type="password"
-                        class="form-control"
-                        id="confirmPassword"
-                        required
-                    />
-                </div>
+                    <div class="col-12">
+                        <div
+                            id="registerError"
+                            class="alert alert-danger d-none"
+                        ></div>
+                    </div>
 
-                <div id="registerError" class="error-message"></div>
-
-                <div class="d-grid">
-                    <button type="submit" class="btn btn-success">
-                        Registriraj se
-                    </button>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-success w-100">
+                            <i class="fas fa-user-plus me-2"></i>Registriraj se
+                        </button>
+                    </div>
                 </div>
             </form>
 
