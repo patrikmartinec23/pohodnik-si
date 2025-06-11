@@ -71,7 +71,9 @@ class NavbarComponent {
                                 user
                                     ? `
         <li class="nav-item">
-            <a class="nav-link" href="./profil.html">
+            <a class="nav-link" href="./${
+                user.type === 'drustvo' ? 'profil-drustvo.html' : 'profil.html'
+            }">
                 <i class="fas fa-user me-1"></i>${user.username}
             </a>
         </li>

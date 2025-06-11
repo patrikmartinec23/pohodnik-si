@@ -498,13 +498,29 @@ h5 .badge {
 }
 
 .btn-secondary:hover {
-    background-color: var(--bs-primary);
-    border-color: var(--bs-primary);
     transform: translateY(-1px);
 }
 
 .btn-secondary {
     transition: all 0.2s ease-in-out;
+}
+
+.btn-primary:hover {
+    transform: translateY(-1px);
+}
+
+.btn-primary {
+    transition: all 0.2s ease-in-out;
+}
+
+.hover-shadow {
+    transition: all 0.2s ease-in-out;
+}
+
+.hover-shadow:hover {
+    background-color: #f8f9fa !important;
+    box-shadow: 0 .125rem .25rem rgba(0,0,0,.075);
+    transform: translateY(-1px);
 }
 
 /* Responsive adjustments */

@@ -23,7 +23,8 @@ class Pohod {
                 .select(
                     'p.*',
                     'pd.DrustvoIme as DrustvoIme',
-                    'pd.Naslov as DrustvoNaslov'
+                    'pd.Naslov as DrustvoNaslov',
+                    'pd.TK_Uporabnik as DrustvoUserId'
                 )
                 .leftJoin(
                     'PohodniskoDrustvo as pd',

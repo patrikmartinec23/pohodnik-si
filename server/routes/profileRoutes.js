@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const Profile = require('../models/Profile');
 const auth = require('../middleware/auth');
+const Profile = require('../models/Profile');
+const MembershipRequest = require('../models/MembershipRequest');
 
 // Get user profile
 router.get('/api/users/:id', auth, async (req, res) => {
@@ -66,5 +67,82 @@ router.get('/api/users/:id/statistics', auth, async (req, res) => {
         });
     }
 });
+
+router.get('/api/drustvo/:userId', async (req, res) => {
+    try {
+        const drustvo = await Profile.getDrustvoProfile(req.params.userId);
+
+        if (!drustvo) {
+            return res.status(404).json({ error: 'Društvo not found' });
+        }
+
+        res.json(drustvo);
+    } catch (error) {
+        console.error('Error fetching društvo profile:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+router.get(
+    '/api/drustvo/:drustvoId/membership-requests',
+    auth,
+    async (req, res) => {
+        try {
+            const requests = await MembershipRequest.getRequestsForDrustvo(
+                req.params.drustvoId
+            );
+            res.json(requests);
+        } catch (error) {
+            console.error('Error fetching membership requests:', error);
+            res.status(500).json({ error: 'Server error' });
+        }
+    }
+);
+
+// Submit a membership request
+router.post(
+    '/api/drustvo/:drustvoId/request-membership',
+    auth,
+    async (req, res) => {
+        try {
+            const pohodnik = await db('Pohodnik')
+                .where('TK_Uporabnik', req.user.id)
+                .first();
+
+            if (!pohodnik) {
+                return res.status(404).json({ error: 'Pohodnik not found' });
+            }
+
+            await MembershipRequest.create(
+                req.params.drustvoId,
+                pohodnik.IDPohodnik
+            );
+            res.status(201).json({ message: 'Request submitted successfully' });
+        } catch (error) {
+            console.error('Error submitting membership request:', error);
+            res.status(500).json({ error: 'Server error' });
+        }
+    }
+);
+
+// Handle membership request (accept/reject)
+router.post(
+    '/api/membership-requests/:requestId/:action',
+    auth,
+    async (req, res) => {
+        try {
+            const { requestId, action } = req.params;
+            if (!['accept', 'reject'].includes(action)) {
+                return res.status(400).json({ error: 'Invalid action' });
+            }
+
+            await MembershipRequest.handleRequest(requestId, action);
+            res.json({ message: 'Request handled successfully' });
+        } catch (error) {
+            console.error('Error handling membership request:', error);
+            res.status(500).json({ error: 'Server error' });
+        }
+    }
+);
 
 module.exports = router;

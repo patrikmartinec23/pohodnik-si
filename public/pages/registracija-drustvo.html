@@ -2,7 +2,7 @@
 <html lang="sl">
     <head>
         <meta charset="UTF-8" />
-        <title>Registracija Društva – Pohodnik.si</title>
+        <title>Registracija društva – Pohodnik.si</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link
             href="https://unpkg.com/aos@2.3.1/dist/aos.css"
@@ -13,24 +13,12 @@
         <link rel="stylesheet" href="../css/styles.css" />
         <style>
             .login-container {
-                max-width: 500px;
+                max-width: 800px;
                 margin: 90px auto;
                 background: white;
-                padding: 30px;
+                padding: 2rem;
                 border-radius: 10px;
                 box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            }
-            .error-message {
-                color: #dc3545;
-                font-size: 0.875rem;
-                margin-top: 0.5rem;
-                display: none;
-            }
-            .logo {
-                display: block;
-                margin: 0 auto 20px;
-                max-width: 200px;
-                height: auto;
             }
         </style>
     </head>
@@ -38,378 +26,144 @@
         <div id="navbar"></div>
 
         <div
-            class="login-container mt-8"
+            class="login-container mt-7"
             data-aos="fade-up"
             data-aos-delay="200"
         >
-            <img src="../images/logo.png" alt="Pohodnik.si" class="logo" />
-            <h4 class="text-center mb-3">Registracija Društva</h4>
+            <div class="text-center mb-4">
+                <img
+                    src="../images/logo.png"
+                    alt="Pohodnik.si"
+                    class="logo mb-3 w-25"
+                />
+                <h4>Registracija Društva</h4>
+            </div>
 
-            <form id="registerForm">
-                <!-- Account Information -->
-                <h5 class="mb-3">Podatki za prijavo</h5>
-                <div class="mb-3">
-                    <label for="username" class="form-label"
-                        >Uporabniško ime</label
-                    >
-                    <input
-                        type="text"
-                        class="form-control"
-                        id="username"
-                        required
-                    />
-                </div>
+            <div class="text-center mb-4">
+                <p class="mb-2">Ste pohodnik?</p>
+                <a
+                    href="registracija-pohodnik.html"
+                    class="btn btn-outline-secondary"
+                >
+                    <i class="fas fa-user me-2"></i>Registriraj pohodnika
+                </a>
+            </div>
 
-                <div class="mb-3">
-                    <label for="password" class="form-label">Geslo</label>
-                    <input
-                        type="password"
-                        class="form-control"
-                        id="password"
-                        required
-                    />
-                </div>
+            <form id="registerForm" class="needs-validation" novalidate>
+                <div class="row g-3">
+                    <!-- Account Details -->
+                    <div class="col-12">
+                        <h5 class="border-bottom pb-2">Podatki za prijavo</h5>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="username" class="form-label"
+                            >Uporabniško ime</label
+                        >
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="username"
+                            required
+                        />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="password" class="form-label">Geslo</label>
+                        <input
+                            type="password"
+                            class="form-control"
+                            id="password"
+                            required
+                        />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="confirmPassword" class="form-label"
+                            >Potrdi geslo</label
+                        >
+                        <input
+                            type="password"
+                            class="form-control"
+                            id="confirmPassword"
+                            required
+                        />
+                    </div>
 
-                <div class="mb-3">
-                    <label for="confirmPassword" class="form-label"
-                        >Potrdi geslo</label
-                    >
-                    <input
-                        type="password"
-                        class="form-control"
-                        id="confirmPassword"
-                        required
-                    />
-                </div>
+                    <!-- Personal Information -->
+                    <div class="col-12">
+                        <h5 class="border-bottom pb-2 mt-3">
+                            Podatki o društvu
+                        </h5>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="ime" class="form-label">Ime društva</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="ime"
+                            required
+                        />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="naslov" class="form-label">Naslov</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="naslov"
+                            required
+                        />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="datumUstanovitve" class="form-label"
+                            >Leto ustanovitve</label
+                        >
+                        <input
+                            type="year"
+                            class="form-control"
+                            id="datumUstanovitve"
+                            required
+                        />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="predsednik" class="form-label"
+                            >Predsednik društva</label
+                        >
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="predsednik"
+                            required
+                        />
+                    </div>
 
-                <hr class="my-4" />
+                    <div class="col-12">
+                        <div
+                            id="registerError"
+                            class="alert alert-danger d-none"
+                        ></div>
+                    </div>
 
-                <!-- Society Information -->
-                <h5 class="mb-3">Podatki o društvu</h5>
-                <div class="mb-3">
-                    <label for="DrustvoIme" class="form-label"
-                        >Ime društva</label
-                    >
-                    <input
-                        type="text"
-                        class="form-control"
-                        id="DrustvoIme"
-                        required
-                    />
-                </div>
-
-                <div class="mb-3">
-                    <label for="Naslov" class="form-label">Naslov sedeža</label>
-                    <input
-                        type="text"
-                        class="form-control"
-                        id="Naslov"
-                        required
-                    />
-                </div>
-
-                <div class="mb-3">
-                    <label for="LetoUstanovitve" class="form-label"
-                        >Leto ustanovitve</label
-                    >
-                    <input
-                        type="number"
-                        class="form-control"
-                        id="LetoUstanovitve"
-                        min="1900"
-                        max="2025"
-                        required
-                    />
-                </div>
-
-                <div class="mb-3">
-                    <label for="Predsednik" class="form-label"
-                        >Predsednik društva</label
-                    >
-                    <input
-                        type="text"
-                        class="form-control"
-                        id="Predsednik"
-                        required
-                    />
-                </div>
-
-                <div id="registerError" class="error-message"></div>
-
-                <div class="d-grid">
-                    <button type="submit" class="btn btn-success">
-                        <i class="fas fa-users me-2"></i>Registriraj društvo
-                    </button>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-users me-2"></i>Registriraj društvo
+                        </button>
+                    </div>
                 </div>
             </form>
 
             <p class="text-center mt-3">
                 Že imate račun? <a href="prijava.html">Prijava</a>
             </p>
-
-            <p class="text-center mt-2">
-                Ste pohodnik?
-                <a href="registracija-pohodnik.html">Registracija pohodnika</a>
-            </p>
         </div>
 
         <div id="footer"></div>
 
-        <script>
-            // Auth class with enhanced error handling
-            class Auth {
-                static async login(username, password, type) {
-                    try {
-                        const response = await fetch('/api/login', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                uporabniskoIme: username,
-                                geslo: password,
-                                tip: type,
-                            }),
-                            credentials: 'include',
-                        });
-
-                        const data = await response.json();
-
-                        if (data.success) {
-                            // Note: Using in-memory storage instead of localStorage for this environment
-                            window.userData = data.user;
-                            return { success: true, user: data.user };
-                        } else {
-                            return { success: false, error: data.error };
-                        }
-                    } catch (error) {
-                        console.error('Login error:', error);
-                        return { success: false, error: 'Napaka pri prijavi' };
-                    }
-                }
-
-                static async register(userData) {
-                    try {
-                        const response = await fetch('/api/register', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify(userData),
-                            credentials: 'include',
-                        });
-
-                        const data = await response.json();
-
-                        if (data.success) {
-                            // Note: Using in-memory storage instead of localStorage for this environment
-                            window.userData = data.user;
-                            return { success: true, user: data.user };
-                        } else {
-                            return { success: false, error: data.error };
-                        }
-                    } catch (error) {
-                        console.error('Registration error:', error);
-                        return {
-                            success: false,
-                            error: 'Napaka pri registraciji',
-                        };
-                    }
-                }
-
-                static async logout() {
-                    try {
-                        await fetch('/api/logout', {
-                            method: 'POST',
-                            credentials: 'include',
-                        });
-                        window.userData = null;
-                        window.location.href = '/pages/prijava.html';
-                    } catch (error) {
-                        console.error('Logout error:', error);
-                    }
-                }
-
-                static getUser() {
-                    return window.userData || null;
-                }
-
-                static isLoggedIn() {
-                    return !!this.getUser();
-                }
-
-                static redirectIfNotAuthenticated() {
-                    if (!this.isLoggedIn()) {
-                        window.location.href = '/pages/prijava.html';
-                    }
-                }
-            }
-
-            // Form submission handler
-            document
-                .getElementById('registerForm')
-                .addEventListener('submit', async (e) => {
-                    e.preventDefault();
-
-                    const username = document.getElementById('username').value;
-                    const password = document.getElementById('password').value;
-                    const confirmPassword =
-                        document.getElementById('confirmPassword').value;
-                    const errorElement =
-                        document.getElementById('registerError');
-
-                    // Clear previous errors
-                    errorElement.style.display = 'none';
-                    errorElement.textContent = '';
-
-                    // Validation
-                    if (password !== confirmPassword) {
-                        errorElement.textContent = 'Gesli se ne ujemata';
-                        errorElement.style.display = 'block';
-                        return;
-                    }
-
-                    if (password.length < 4) {
-                        errorElement.textContent =
-                            'Geslo mora imeti vsaj 4 znake';
-                        errorElement.style.display = 'block';
-                        return;
-                    }
-
-                    if (username.length < 3) {
-                        errorElement.textContent =
-                            'Uporabniško ime mora imeti vsaj 3 znake';
-                        errorElement.style.display = 'block';
-                        return;
-                    }
-
-                    // Get society data
-                    const societyData = {
-                        uporabniskoIme: username,
-                        geslo: password,
-                        tip: 'drustvo',
-                        DrustvoIme: document.getElementById('DrustvoIme').value,
-                        Naslov: document.getElementById('Naslov').value,
-                        LetoUstanovitve: parseInt(
-                            document.getElementById('LetoUstanovitve').value
-                        ),
-                        Predsednik: document.getElementById('Predsednik').value,
-                    };
-
-                    // Validate society data
-                    if (!societyData.DrustvoIme.trim()) {
-                        errorElement.textContent = 'Vnesite ime društva';
-                        errorElement.style.display = 'block';
-                        return;
-                    }
-
-                    if (!societyData.Naslov.trim()) {
-                        errorElement.textContent = 'Vnesite naslov sedeža';
-                        errorElement.style.display = 'block';
-                        return;
-                    }
-
-                    if (
-                        !societyData.LetoUstanovitve ||
-                        societyData.LetoUstanovitve < 1900 ||
-                        societyData.LetoUstanovitve > 2025
-                    ) {
-                        errorElement.textContent =
-                            'Vnesite veljavno leto ustanovitve';
-                        errorElement.style.display = 'block';
-                        return;
-                    }
-
-                    if (!societyData.Predsednik.trim()) {
-                        errorElement.textContent = 'Vnesite ime predsednika';
-                        errorElement.style.display = 'block';
-                        return;
-                    }
-
-                    // Disable submit button during request
-                    const submitButton = document.querySelector(
-                        'button[type="submit"]'
-                    );
-                    const originalText = submitButton.innerHTML;
-                    submitButton.disabled = true;
-                    submitButton.innerHTML =
-                        '<i class="fas fa-spinner fa-spin me-2"></i>Registriram...';
-
-                    try {
-                        const result = await Auth.register(societyData);
-
-                        if (result.success) {
-                            // Show success message
-                            errorElement.className = 'error-message';
-                            errorElement.style.color = '#28a745';
-                            errorElement.textContent =
-                                'Registracija uspešna! Preusmerjam...';
-                            errorElement.style.display = 'block';
-
-                            // Redirect after short delay
-                            setTimeout(() => {
-                                window.location.href = '/pages/pohodi.html';
-                            }, 1500);
-                        } else {
-                            errorElement.style.color = '#dc3545';
-                            errorElement.textContent =
-                                result.error || 'Napaka pri registraciji';
-                            errorElement.style.display = 'block';
-                        }
-                    } catch (error) {
-                        console.error('Registration error:', error);
-                        errorElement.style.color = '#dc3545';
-                        errorElement.textContent =
-                            'Napaka pri registraciji. Poskusite znova.';
-                        errorElement.style.display = 'block';
-                    } finally {
-                        // Re-enable submit button
-                        submitButton.disabled = false;
-                        submitButton.innerHTML = originalText;
-                    }
-                });
-
-            // Redirect if already logged in
-            if (Auth.isLoggedIn()) {
-                window.location.href = '/pages/pohodi.html';
-            }
-
-            // Load navbar and footer (mock implementation)
-            document.addEventListener('DOMContentLoaded', function () {
-                // Mock navbar
-                const navbar = document.getElementById('navbar');
-                if (navbar) {
-                    navbar.innerHTML = `
-                        <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
-                            <div class="container">
-                                <a class="navbar-brand" href="#">Pohodnik.si</a>
-                            </div>
-                        </nav>
-                    `;
-                }
-
-                // Mock footer
-                const footer = document.getElementById('footer');
-                if (footer) {
-                    footer.innerHTML = `
-                        <footer class="bg-dark text-white py-4 mt-5">
-                            <div class="container text-center">
-                                <p>&copy; 2025 Pohodnik.si. Vse pravice pridržane.</p>
-                            </div>
-                        </footer>
-                    `;
-                }
-            });
-        </script>
-
-        <!-- External scripts -->
+        <script src="../utils/Auth.js"></script>
+        <script src="../components/Navbar.js"></script>
+        <script src="../components/Footer.js"></script>
         <script src="../js/bootstrap.bundle.min.js"></script>
+        <script src="../components/RegisterDrustvo.js"></script>
         <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
         <script>
-            // Initialize AOS animations
-            if (typeof AOS !== 'undefined') {
-                AOS.init();
-            }
+            AOS.init();
         </script>
     </body>
 </html>

@@ -47,16 +47,15 @@ class Pohod {
         const duration = pohod.Trajanje.split(':')[0];
         const user = Auth.getUser();
 
-        // In the template, replace the button section with this:
         const buttonHtml = user
-            ? `
-            <button class="btn btn-primary btn-lg" onclick="prijavaNaPohod(${pohod.IDPohod})">
+            ? user.type === 'drustvo'
+                ? '' // No button for društvo
+                : `<button class="btn btn-primary btn-lg" onclick="prijavaNaPohod(${pohod.IDPohod})">
                 <i class="fas fa-user-plus me-2"></i>Prijavi se na pohod
-            </button>`
-            : `
-            <a href="./prijava.html" class="btn btn-primary btn-lg">
-                <i class="fas fa-sign-in-alt me-2"></i>Prijavi se
-            </a>`;
+               </button>`
+            : `<a href="./prijava.html" class="btn btn-primary btn-lg">
+            <i class="fas fa-sign-in-alt me-2"></i>Prijavi se
+           </a>`;
 
         this.container.innerHTML = `
             <section class="pohod-detail mb-4">
@@ -180,17 +179,19 @@ class Pohod {
                                         }
                                     </ul>
 
-                                    <hr class="my-4">
-
-                                  
+                                    <hr class="my-4">                      
 <div class="mb-3">
     <h5 class="h6 mb-2">Organizator pohoda</h5>
-    <p class="mb-0">
-        <i class="fas fa-building me-2"></i>${pohod.DrustvoIme}
-    </p>
-    <small class="text-muted">
-        <i class="fas fa-map-marker-alt me-2"></i>${pohod.DrustvoNaslov}
-    </small>
+    <a href="./profil-drustvo.html?id=${pohod.DrustvoUserId}" 
+       class="text-decoration-none">
+        <div class="d-flex align-items-center p-2 rounded bg-light hover-shadow">
+            <i class="fas fa-users text-primary me-3 fa-2x"></i>
+            <div>
+                <h6 class="mb-0 text-primary">${pohod.DrustvoIme}</h6>
+            </div>
+            <i class="fas fa-chevron-right ms-auto text-muted"></i>
+        </div>
+    </a>
 </div>
 
 

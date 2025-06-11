@@ -139,6 +139,33 @@ class Profile {
             throw error;
         }
     }
+
+    static async getDrustvoProfile(userId) {
+        try {
+            const drustvo = await db('PohodniskoDrustvo as pd')
+                .select('pd.*', 'u.UporabniskoIme')
+                .join('Uporabnik as u', 'pd.TK_Uporabnik', 'u.IDUporabnik')
+                .where('pd.TK_Uporabnik', userId)
+                .first();
+
+            if (!drustvo) {
+                return null;
+            }
+
+            const pohodiCount = await db('Pohod')
+                .where('TK_PohodniskoDrustvo', drustvo.IDPohodniskoDrustvo)
+                .count('* as count')
+                .first();
+
+            return {
+                ...drustvo,
+                pohodiCount: pohodiCount.count,
+            };
+        } catch (error) {
+            console.error('Error in getDrustvoProfile:', error);
+            throw error;
+        }
+    }
 }
 
 module.exports = Profile;
