@@ -2,10 +2,19 @@ class ProfileDrustvo {
     constructor() {
         this.container = document.getElementById('main-content');
         this.drustvoId = new URLSearchParams(window.location.search).get('id');
-        this.currentPage = 1;
-        this.loading = false;
-        this.hasMore = true;
+
+        this.upcomingPage = 1;
+        this.pastPage = 1;
+        this.ratingsPage = 1; // Add this
+        this.upcomingLoading = false;
+        this.pastLoading = false;
+        this.ratingsLoading = false; // Add this
+        this.upcomingHasMore = true;
+        this.pastHasMore = true;
+        this.ratingsHasMore = true; // Add this
         this.itemsPerPage = 2;
+        this.ratingsPerPage = 5; // Add this
+
         window.profileDrustvo = this;
         this.init();
     }
@@ -47,8 +56,14 @@ class ProfileDrustvo {
                 this.loadMembershipRequests(drustvo.IDPohodniskoDrustvo);
             }
 
-            // Load organizirani pohodi for all visitors
-            this.loadOrganiziraniPohodi(drustvo.IDPohodniskoDrustvo);
+            // Store the drustvo ID for consistent use
+            if (!this.currentDrustvoId) {
+                this.currentDrustvoId = drustvo.IDPohodniskoDrustvo;
+            }
+
+            // Load both upcoming and past pohodi instead of the old method
+            this.loadUpcomingPohodi(drustvo.IDPohodniskoDrustvo);
+            this.loadPastPohodi(drustvo.IDPohodniskoDrustvo);
         } catch (error) {
             console.error('Error loading profile:', error);
             this.showError('Napaka pri nalaganju profila');
@@ -56,7 +71,6 @@ class ProfileDrustvo {
     }
 
     renderProfile(drustvo, isOwner, membershipStatus) {
-        // Get current user to check type
         const user = Auth.getUser();
 
         // Determine button content based on membership status
@@ -133,6 +147,12 @@ class ProfileDrustvo {
                     <div class="card shadow-sm bg-light">
                         <div class="card-body">
                             <h4 class="card-title mb-4">O društvu</h4>
+                            
+                            <!-- Average Rating Display -->
+                            <div class="text-center mb-4" id="averageRatingDisplay">
+                                <!-- Average rating will be loaded here -->
+                            </div>
+                            
                             <ul class="list-unstyled">
                                 <li class="mb-3">
                                     <i class="fas fa-map-marker-alt text-primary me-2"></i>${
@@ -162,7 +182,7 @@ class ProfileDrustvo {
                     ${
                         isOwner
                             ? `
-                        <div class="card shadow-sm mt-4">
+                        <div class="card shadow-sm mt-4 bg-light">
                             <div class="card-body">
                                 <h5 class="card-title">Zahteve za včlanitev</h5>
                                 <div id="membership-requests">
@@ -177,11 +197,49 @@ class ProfileDrustvo {
 
                 <!-- Right column -->
                 <div class="col-lg-8">
-                    <div class="card shadow-sm bg-light">
+                    <!-- Upcoming Events Section -->
+                    <div class="card shadow-sm bg-light mb-4">
                         <div class="card-body">
-                            <h5 class="card-title mb-4">Organizirani pohodi</h5>
-                            <div id="pohodi-list">
-                                <!-- Pohodi will be loaded here -->
+                            <h5 class="card-title mb-4">
+                                <i class="fas fa-calendar-plus me-2 text-success"></i>Prihajajoči pohodi
+                            </h5>
+                            <div id="upcoming-pohodi-list">
+                                <!-- Upcoming pohodi will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Past Events Section -->
+                    <div class="card shadow-sm bg-light mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title mb-4">
+                                <i class="fas fa-history me-2 text-secondary"></i>Pretekli dogodki
+                            </h5>
+                            <div id="past-pohodi-list">
+                                <!-- Past pohodi will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Rating Section (for members only) - MOVED HERE -->
+                    ${
+                        user && user.type === 'pohodnik' && !isOwner
+                            ? `
+                        <div class="card shadow-sm bg-light mb-4" id="ratingSection">
+                            <!-- Rating form/display will be loaded here -->
+                        </div>
+                    `
+                            : ''
+                    }
+
+                    <!-- Ratings Display - MOVED HERE -->
+                    <div class="card shadow-sm bg-light mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title mb-4">
+                                <i class="fas fa-star me-2 text-warning"></i>Ocene članov
+                            </h5>
+                            <div id="ratings-list">
+                                <!-- Ratings will be loaded here -->
                             </div>
                         </div>
                     </div>
@@ -189,6 +247,365 @@ class ProfileDrustvo {
             </div>
         </div>
     `;
+
+        // Load average rating
+        this.loadAverageRating(drustvo.IDPohodniskoDrustvo);
+
+        // Load ratings
+        this.loadRatings(drustvo.IDPohodniskoDrustvo);
+
+        // Load rating form for eligible users
+        if (user && user.type === 'pohodnik' && !isOwner) {
+            this.loadRatingSection(drustvo.IDPohodniskoDrustvo);
+        }
+    }
+
+    // Add these new methods:
+
+    async loadAverageRating(drustvoId) {
+        try {
+            const response = await fetch(
+                `/api/drustvo/${drustvoId}/average-rating`
+            );
+            const { average, total } = await response.json();
+
+            const container = document.getElementById('averageRatingDisplay');
+
+            if (total === 0) {
+                container.innerHTML = `
+                    <div class="text-muted">
+                        <i class="fas fa-star-o fa-2x mb-2"></i>
+                        <p class="mb-0">Še ni ocen</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="average-rating">
+                    <div class="rating-display mb-2">
+                        ${this.renderStars(parseFloat(average), true)}
+                    </div>
+                    <h4 class="mb-1">${average}/5</h4>
+                    <small class="text-muted">${total} ${
+                total === 1 ? 'ocena' : total < 5 ? 'oceni' : 'ocen'
+            }</small>
+                </div>
+            `;
+        } catch (error) {
+            console.error('Error loading average rating:', error);
+        }
+    }
+
+    async loadRatingSection(drustvoId) {
+        try {
+            // Check if user can rate
+            const canRateResponse = await fetch(
+                `/api/drustvo/${drustvoId}/can-rate`
+            );
+            const { canRate, reason } = await canRateResponse.json();
+
+            // Get user's existing rating
+            const userRatingResponse = await fetch(
+                `/api/drustvo/${drustvoId}/my-rating`
+            );
+            const userRating = await userRatingResponse.json();
+
+            const container = document.getElementById('ratingSection');
+
+            if (!canRate) {
+                container.innerHTML = `
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-star me-2 text-warning"></i>Ocenite društvo
+                        </h5>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            ${
+                                reason === 'Must be a member to rate'
+                                    ? 'Za ocenjevanje morate biti član društva.'
+                                    : 'Ocenjevanje ni možno.'
+                            }
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            const hasRating = userRating && userRating.Ocena;
+
+            container.innerHTML = `
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-star me-2 text-warning"></i>
+                        ${hasRating ? 'Vaša ocena' : 'Ocenite društvo'}
+                    </h5>
+                    
+                    <form id="ratingForm" data-drustvo-id="${drustvoId}">
+                        <div class="mb-3">
+                            <label class="form-label">Ocena:</label>
+                            <div class="rating-input" id="ratingStars">
+                                ${[5, 4, 3, 2, 1]
+                                    .map(
+                                        (num) => `
+                                    <input type="radio" id="star${num}" name="rating" value="${num}" 
+                                           ${
+                                               hasRating &&
+                                               userRating.Ocena == num
+                                                   ? 'checked'
+                                                   : ''
+                                           }>
+                                    <label for="star${num}" class="star">
+                                        <i class="fas fa-star"></i>
+                                    </label>
+                                `
+                                    )
+                                    .join('')}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="ratingComment" class="form-label">Komentar (neobvezno):</label>
+                            <textarea class="form-control" id="ratingComment" name="comment" rows="3" 
+                                      placeholder="Opišite svoje izkušnje z društvom...">${
+                                          hasRating
+                                              ? userRating.Komentar || ''
+                                              : ''
+                                      }</textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-warning">
+                            <i class="fas fa-star me-2"></i>
+                            ${hasRating ? 'Posodobi oceno' : 'Oddaj oceno'}
+                        </button>
+                    </form>
+                </div>
+            `;
+
+            // Add event listener for form submission
+            document
+                .getElementById('ratingForm')
+                .addEventListener('submit', this.handleRatingSubmit.bind(this));
+        } catch (error) {
+            console.error('Error loading rating section:', error);
+        }
+    }
+
+    async handleRatingSubmit(e) {
+        e.preventDefault();
+
+        const formData = new FormData(e.target);
+        const rating = formData.get('rating');
+        const comment = formData.get('comment');
+        const drustvoId = e.target.dataset.drustvoId;
+
+        if (!rating) {
+            alert('Prosimo, izberite oceno.');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/drustvo/${drustvoId}/rating`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    rating: parseInt(rating),
+                    comment: comment.trim() || null,
+                }),
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error);
+            }
+
+            alert('Ocena je bila uspešno oddana!');
+
+            // Refresh the rating section and average rating
+            await this.loadRatingSection(drustvoId);
+            await this.loadAverageRating(drustvoId);
+            await this.loadRatings(drustvoId);
+        } catch (error) {
+            console.error('Error submitting rating:', error);
+            alert('Napaka pri oddaji ocene: ' + error.message);
+        }
+    }
+
+    async loadRatings(drustvoId, isLoadMore = false) {
+        if (this.ratingsLoading) return;
+        if (isLoadMore && !this.ratingsHasMore) return;
+
+        try {
+            this.ratingsLoading = true;
+
+            const response = await fetch(
+                `/api/drustvo/${drustvoId}/ratings?page=${this.ratingsPage}&limit=${this.ratingsPerPage}`
+            );
+
+            if (!response.ok) throw new Error('Failed to load ratings');
+
+            const { ratings, total, hasMore } = await response.json();
+            const container = document.getElementById('ratings-list');
+
+            if (!ratings || !ratings.length) {
+                if (!isLoadMore) {
+                    container.innerHTML = `
+                        <div class="text-center py-4">
+                            <i class="fas fa-star-o fa-3x text-muted mb-3"></i>
+                            <p class="text-muted mb-0">Še ni ocen</p>
+                        </div>
+                    `;
+                }
+                this.ratingsHasMore = false;
+                return;
+            }
+
+            const ratingsHtml = ratings
+                .map(
+                    (rating) => `
+                <div class="rating-item border-bottom py-3">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <strong>${rating.Ime} ${rating.Priimek}</strong>
+                            <small class="text-muted ms-2">@${
+                                rating.UporabniskoIme
+                            }</small>
+                        </div>
+                        <div class="text-end">
+                            <div class="rating-display mb-1">
+                                ${this.renderStars(rating.Ocena)}
+                            </div>
+                            <small class="text-muted">
+                                ${new Date(
+                                    rating.DatumOcene
+                                ).toLocaleDateString('sl-SI')}
+                            </small>
+                        </div>
+                    </div>
+                    ${
+                        rating.Komentar
+                            ? `
+                        <p class="mb-0 text-muted">${rating.Komentar}</p>
+                    `
+                            : ''
+                    }
+                </div>
+            `
+                )
+                .join('');
+
+            if (isLoadMore) {
+                const existingContent =
+                    container.querySelector('.ratings-content');
+                if (existingContent) {
+                    existingContent.insertAdjacentHTML(
+                        'beforeend',
+                        ratingsHtml
+                    );
+                }
+            } else {
+                container.innerHTML = `
+                    <div class="ratings-content">
+                        ${ratingsHtml}
+                    </div>
+                `;
+            }
+
+            this.ratingsHasMore = hasMore;
+            this.updateLoadMoreButton(container, total, 'ratings');
+        } catch (error) {
+            console.error('Error loading ratings:', error);
+            if (!isLoadMore) {
+                const container = document.getElementById('ratings-list');
+                container.innerHTML = `
+                    <div class="text-center py-4">
+                        <i class="fas fa-exclamation-triangle fa-3x text-muted mb-3"></i>
+                        <p class="text-muted mb-0">Napaka pri nalaganju ocen</p>
+                    </div>
+                `;
+            }
+        } finally {
+            this.ratingsLoading = false;
+        }
+    }
+
+    renderStars(rating, large = false) {
+        const fullStars = Math.floor(rating);
+        const hasHalfStar = rating % 1 >= 0.5;
+        const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+
+        const starSize = large ? 'fa-lg' : '';
+
+        let starsHtml = '';
+
+        // Full stars
+        for (let i = 0; i < fullStars; i++) {
+            starsHtml += `<i class="fas fa-star text-warning ${starSize}"></i>`;
+        }
+
+        // Half star
+        if (hasHalfStar) {
+            starsHtml += `<i class="fas fa-star-half-alt text-warning ${starSize}"></i>`;
+        }
+
+        // Empty stars
+        for (let i = 0; i < emptyStars; i++) {
+            starsHtml += `<i class="far fa-star text-warning ${starSize}"></i>`;
+        }
+
+        return starsHtml;
+    }
+
+    // Update the updateLoadMoreButton method to handle ratings:
+    updateLoadMoreButton(container, total, type) {
+        const existingBtn = container.querySelector('.load-more-container');
+        if (existingBtn) {
+            existingBtn.remove();
+        }
+
+        let hasMore;
+        switch (type) {
+            case 'upcoming':
+                hasMore = this.upcomingHasMore;
+                break;
+            case 'past':
+                hasMore = this.pastHasMore;
+                break;
+            case 'ratings':
+                hasMore = this.ratingsHasMore;
+                break;
+            default:
+                hasMore = false;
+        }
+
+        if (hasMore) {
+            const loadMoreHtml = `
+                <div class="text-center mt-4 load-more-container">
+                    <button class="btn btn-outline-primary load-more" data-type="${type}">
+                        <i class="fas fa-plus-circle me-2"></i>Prikaži več
+                    </button>
+                </div>`;
+
+            container.insertAdjacentHTML('beforeend', loadMoreHtml);
+
+            const loadMoreBtn = container.querySelector('.load-more');
+            if (loadMoreBtn) {
+                loadMoreBtn.addEventListener('click', () => {
+                    if (type === 'upcoming') {
+                        this.upcomingPage++;
+                        this.loadUpcomingPohodi(this.currentDrustvoId, true);
+                    } else if (type === 'past') {
+                        this.pastPage++;
+                        this.loadPastPohodi(this.currentDrustvoId, true);
+                    } else if (type === 'ratings') {
+                        this.ratingsPage++;
+                        this.loadRatings(this.currentDrustvoId, true);
+                    }
+                });
+            }
+        }
     }
 
     async loadMembershipRequests(drustvoId) {
@@ -354,41 +771,188 @@ class ProfileDrustvo {
         `;
     }
 
-    async loadOrganiziraniPohodi(drustvoId, isLoadMore = false) {
-        if (this.loading) {
-            return;
+    createPohodCard(pohod, isOwner) {
+        const date = new Date(pohod.DatumPohoda).toLocaleDateString('sl-SI');
+        const truncatedLocation =
+            pohod.Lokacija?.length > 15
+                ? pohod.Lokacija.substring(0, 12) + '...'
+                : pohod.Lokacija || 'N/A';
+        const truncatedZbirnoMesto =
+            pohod.ZbirnoMesto?.length > 20
+                ? pohod.ZbirnoMesto.substring(0, 17) + '...'
+                : pohod.ZbirnoMesto || 'N/A';
+        const duration = pohod.Trajanje ? pohod.Trajanje.split(':')[0] : '?';
+
+        return `
+    <div class="col-md-6 mb-4">
+        <div class="card pohod-card hover-shadow h-100">
+            <a href="pohod.html?id=${
+                pohod.IDPohod
+            }" class="text-decoration-none">
+                <img src="../images/project-1.jpg" 
+                     alt="${pohod.PohodIme}" 
+                     class="card-img-top" 
+                     style="height: 200px; object-fit: cover;"
+                     onerror="this.src='../images/default-pohod.jpg'" />
+            </a>
+            <div class="card-body d-flex flex-column">
+                <a href="pohod.html?id=${
+                    pohod.IDPohod
+                }" class="text-decoration-none text-dark flex-grow-1">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 class="card-title mb-0">
+                            <strong>${pohod.PohodIme}</strong>
+                        </h5>
+                        <span class="badge bg-primary" title="${
+                            pohod.Lokacija
+                        }">
+                            <i class="fas fa-mountain me-1"></i>${truncatedLocation}
+                        </span>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2 mb-3">
+                        <span class="badge bg-success me-1">
+                            <i class="fas fa-hiking me-1"></i>${
+                                pohod.Tezavnost
+                            }/5
+                        </span>
+                        <span class="badge bg-info me-1">
+                            <i class="fas fa-clock me-1"></i>${duration}h
+                        </span>
+                        <span class="badge bg-warning text-dark" title="${
+                            pohod.ZbirnoMesto
+                        }">
+                            <i class="fas fa-map-marker-alt me-1"></i>${truncatedZbirnoMesto}
+                        </span>
+                    </div>    
+                    <strong class="mb-2 d-block">
+                        <i class="fas fa-calendar me-1"></i>${date}
+                    </strong>
+                    <div class="mt-auto">
+                        <small class="text-muted">
+                            <i class="fas fa-users me-1"></i>Prosta mesta: ${
+                                pohod.ProstaMesta
+                            }
+                        </small>
+                    </div>
+                </a>
+                ${
+                    isOwner
+                        ? `
+                    <div class="d-flex gap-2 mb-3">
+                        <a href="./dodaj-pohod.html?edit=${pohod.IDPohod}" 
+                           class="btn btn-outline-primary btn-sm flex-fill">
+                            <i class="fas fa-edit me-1"></i>
+                        </a>
+                        <button onclick="profileDrustvo.deletePohod(${pohod.IDPohod})" 
+                                class="btn btn-outline-danger btn-sm flex-fill">
+                            <i class="fas fa-trash me-1"></i>
+                        </button>
+                    </div>
+                `
+                        : ''
+                }
+            </div>
+        </div>
+    </div>
+    `;
+    }
+
+    async loadPastPohodi(drustvoId, isLoadMore = false) {
+        if (this.pastLoading) return;
+        if (isLoadMore && !this.pastHasMore) return;
+
+        try {
+            this.pastLoading = true;
+
+            const response = await fetch(
+                `/api/drustvo/${drustvoId}/pohodi/past?page=${this.pastPage}&limit=${this.itemsPerPage}`
+            );
+
+            if (!response.ok) throw new Error('Failed to load past pohodi');
+
+            const { pohodi, total } = await response.json();
+            const container = document.getElementById('past-pohodi-list');
+
+            if (!pohodi || !pohodi.length) {
+                if (!isLoadMore) {
+                    container.innerHTML = `
+                        <div class="text-center py-4">
+                            <i class="fas fa-history fa-3x text-muted mb-3"></i>
+                            <p class="text-muted mb-0">Še ni izvedenih pohodov</p>
+                        </div>
+                    `;
+                }
+                this.pastHasMore = false;
+                return;
+            }
+
+            const pohodiCards = pohodi
+                .map((pohod) => this.createPastPohodCard(pohod))
+                .join('');
+
+            if (isLoadMore) {
+                const cardsContainer = container.querySelector('.row');
+                if (cardsContainer) {
+                    cardsContainer.insertAdjacentHTML('beforeend', pohodiCards);
+                }
+            } else {
+                container.innerHTML = `
+                    <div class="row g-4">
+                        ${pohodiCards}
+                    </div>
+                `;
+            }
+
+            const loadedCount = this.pastPage * this.itemsPerPage;
+            this.pastHasMore = loadedCount < total;
+
+            this.updateLoadMoreButton(container, total, 'past');
+        } catch (error) {
+            console.error('Error loading past pohodi:', error);
+            if (!isLoadMore) {
+                const container = document.getElementById('past-pohodi-list');
+                container.innerHTML = `
+                    <div class="text-center py-4">
+                        <i class="fas fa-exclamation-triangle fa-3x text-muted mb-3"></i>
+                        <p class="text-muted mb-0">Napaka pri nalaganju preteklih pohodov</p>
+                    </div>
+                `;
+            }
+        } finally {
+            this.pastLoading = false;
         }
+    }
+
+    async loadUpcomingPohodi(drustvoId, isLoadMore = false) {
+        if (this.upcomingLoading) return;
+        if (isLoadMore && !this.upcomingHasMore) return;
 
         if (!this.currentDrustvoId) {
             this.currentDrustvoId = drustvoId;
         }
 
-        if (isLoadMore && !this.hasMore) {
-            return;
-        }
-
         try {
-            this.loading = true;
+            this.upcomingLoading = true;
 
             const response = await fetch(
-                `/api/drustvo/${drustvoId}/pohodi?page=${this.currentPage}&limit=${this.itemsPerPage}`
+                `/api/drustvo/${drustvoId}/pohodi/upcoming?page=${this.upcomingPage}&limit=${this.itemsPerPage}`
             );
 
-            if (!response.ok) throw new Error('Failed to load pohodi');
+            if (!response.ok) throw new Error('Failed to load upcoming pohodi');
 
             const { pohodi, total } = await response.json();
-            const container = document.getElementById('pohodi-list');
+            const container = document.getElementById('upcoming-pohodi-list');
 
             if (!pohodi || !pohodi.length) {
                 if (!isLoadMore) {
                     container.innerHTML = `
-                    <div class="text-center py-4">
-                        <i class="fas fa-hiking fa-3x text-muted mb-3"></i>
-                        <p class="text-muted mb-0">Še niste organizirali nobenega pohoda</p>
-                    </div>
-                `;
+                        <div class="text-center py-4">
+                            <i class="fas fa-calendar-plus fa-3x text-muted mb-3"></i>
+                            <p class="text-muted mb-0">Trenutno ni načrtovanih pohodov</p>
+                        </div>
+                    `;
                 }
-                this.hasMore = false;
+                this.upcomingHasMore = false;
                 return;
             }
 
@@ -407,76 +971,46 @@ class ProfileDrustvo {
                 }
             } else {
                 container.innerHTML = `
-                <div class="row g-4">
-                    ${pohodiCards}
-                </div>
-            `;
+                    <div class="row g-4">
+                        ${pohodiCards}
+                    </div>
+                `;
             }
 
-            const loadedCount = this.currentPage * this.itemsPerPage;
-            this.hasMore = loadedCount < total;
+            const loadedCount = this.upcomingPage * this.itemsPerPage;
+            this.upcomingHasMore = loadedCount < total;
 
-            this.updateLoadMoreButton(container, total);
+            this.updateLoadMoreButton(container, total, 'upcoming');
         } catch (error) {
-            console.error('Error loading organizirani pohodi:', error);
+            console.error('Error loading upcoming pohodi:', error);
             if (!isLoadMore) {
-                const container = document.getElementById('pohodi-list');
+                const container = document.getElementById(
+                    'upcoming-pohodi-list'
+                );
                 container.innerHTML = `
-                <div class="text-center py-4">
-                    <i class="fas fa-exclamation-triangle fa-3x text-muted mb-3"></i>
-                    <p class="text-muted mb-0">Napaka pri nalaganju pohodov</p>
-                </div>
-            `;
+                    <div class="text-center py-4">
+                        <i class="fas fa-exclamation-triangle fa-3x text-muted mb-3"></i>
+                        <p class="text-muted mb-0">Napaka pri nalaganju pohodov</p>
+                    </div>
+                `;
             }
         } finally {
-            this.loading = false;
+            this.upcomingLoading = false;
         }
     }
 
-    updateLoadMoreButton(container, total) {
-        const existingBtn = container.querySelector('.load-more-container');
-        if (existingBtn) {
-            existingBtn.remove();
-        }
-
-        if (this.hasMore) {
-            const loadMoreHtml = `
-            <div class="text-center mt-4 load-more-container">
-                <button class="btn btn-outline-primary load-more">
-                    <i class="fas fa-plus-circle me-2"></i>Prikaži več
-                </button>
-            </div>`;
-
-            container.insertAdjacentHTML('beforeend', loadMoreHtml);
-
-            const loadMoreBtn = container.querySelector('.load-more');
-            if (loadMoreBtn) {
-                loadMoreBtn.addEventListener('click', () => {
-                    this.currentPage++;
-                    this.loadOrganiziraniPohodi(this.currentDrustvoId, true);
-                });
-            }
-        }
-    }
-
-    createPohodCard(pohod, isOwner) {
+    createPastPohodCard(pohod) {
         const date = new Date(pohod.DatumPohoda).toLocaleDateString('sl-SI');
         const truncatedLocation =
             pohod.Lokacija?.length > 15
                 ? pohod.Lokacija.substring(0, 12) + '...'
                 : pohod.Lokacija || 'N/A';
-        const truncatedZbirnoMesto =
-            pohod.ZbirnoMesto?.length > 20
-                ? pohod.ZbirnoMesto.substring(0, 17) + '...'
-                : pohod.ZbirnoMesto || 'N/A';
         const duration = pohod.Trajanje ? pohod.Trajanje.split(':')[0] : '?';
 
         return `
         <div class="col-md-6 mb-4">
             <div class="card pohod-card hover-shadow">
-                <a href="pohod.html?id=${
-                    pohod.IDPohod
-                }" class="text-decoration-none">
+                <a href="pohod.html?id=${pohod.IDPohod}" class="text-decoration-none">
                     <img src="../images/project-1.jpg" 
                          alt="${pohod.PohodIme}" 
                          class="card-img-top" 
@@ -486,90 +1020,75 @@ class ProfileDrustvo {
                             <h5 class="card-title mb-0">
                                 <strong>${pohod.PohodIme}</strong>
                             </h5>
-                            <span class="badge bg-primary" title="${
-                                pohod.Lokacija
-                            }">
+                            <span class="badge bg-secondary" title="${pohod.Lokacija}">
                                 <i class="fas fa-mountain me-1"></i>${truncatedLocation}
                             </span>
                         </div>
                         <div class="d-flex flex-wrap gap-2 mb-3">
                             <span class="badge bg-success me-1">
-                                <i class="fas fa-hiking me-1"></i>${
-                                    pohod.Tezavnost
-                                }/5
+                                <i class="fas fa-hiking me-1"></i>${pohod.Tezavnost}/5
                             </span>
                             <span class="badge bg-info me-1">
                                 <i class="fas fa-clock me-1"></i>${duration}h
                             </span>
-                            <span class="badge bg-warning text-dark" title="${
-                                pohod.ZbirnoMesto
-                            }">
-                                <i class="fas fa-map-marker-alt me-1"></i>${
-                                    pohod.ZbirnoMesto
-                                }
+                            <span class="badge bg-secondary text-white">
+                                <i class="fas fa-check me-1"></i>Izveden
                             </span>
                         </div>    
                         <strong class="mb-2">
                             <i class="fas fa-calendar me-1"></i>${date}
                         </strong>
-                        <div class="mt-2">
-                            <small class="text-muted">
-                                <i class="fas fa-users me-1"></i>Prosta mesta: ${
-                                    pohod.ProstaMesta
-                                }
-                            </small>
-                        </div>
                     </div>
                 </a>
-                ${
-                    isOwner
-                        ? `
-                    <div class="card-footer bg-light border-0">
-                        <div class="btn-group w-100">
-                            <a href="./dodaj-pohod.html?edit=${pohod.IDPohod}" 
-                               class="btn btn-outline-primary btn-sm">
-                                <i class="fas fa-edit me-1"></i>Uredi
-                            </a>
-                            <button onclick="profileDrustvo.deletePohod(${pohod.IDPohod})" 
-                                    class="btn btn-outline-danger btn-sm">
-                                <i class="fas fa-trash me-1"></i>Izbriši
-                            </button>
-                        </div>
-                    </div>
-                `
-                        : ''
-                }
             </div>
         </div>
-    `;
+        `;
     }
 
-    updateLoadMoreButton(container, total) {
-        // Remove existing load more button
+    updateLoadMoreButton(container, total, type) {
         const existingBtn = container.querySelector('.load-more-container');
         if (existingBtn) {
             existingBtn.remove();
         }
 
-        // Add load more button if there are more items to load
-        if (this.hasMore) {
+        let hasMore;
+        switch (type) {
+            case 'upcoming':
+                hasMore = this.upcomingHasMore;
+                break;
+            case 'past':
+                hasMore = this.pastHasMore;
+                break;
+            case 'ratings':
+                hasMore = this.ratingsHasMore;
+                break;
+            default:
+                hasMore = false;
+        }
+
+        if (hasMore) {
             const loadMoreHtml = `
-            <div class="text-center mt-4 load-more-container">
-                <button class="btn btn-outline-primary load-more">
-                    <i class="fas fa-plus-circle me-2"></i>Prikaži več
-                </button>
-            </div>`;
+                <div class="text-center mt-4 load-more-container">
+                    <button class="btn btn-outline-primary load-more" data-type="${type}">
+                        <i class="fas fa-plus-circle me-2"></i>Prikaži več
+                    </button>
+                </div>`;
 
             container.insertAdjacentHTML('beforeend', loadMoreHtml);
 
-            // Add event listener to the new button
             const loadMoreBtn = container.querySelector('.load-more');
             if (loadMoreBtn) {
                 loadMoreBtn.addEventListener('click', () => {
-                    this.currentPage++;
-                    // Use the same drustvoId that was used in the initial load
-                    // Store it as a class property to ensure consistency
-                    this.loadOrganiziraniPohodi(this.currentDrustvoId, true);
+                    if (type === 'upcoming') {
+                        this.upcomingPage++;
+                        this.loadUpcomingPohodi(this.currentDrustvoId, true);
+                    } else if (type === 'past') {
+                        this.pastPage++;
+                        this.loadPastPohodi(this.currentDrustvoId, true);
+                    } else if (type === 'ratings') {
+                        this.ratingsPage++;
+                        this.loadRatings(this.currentDrustvoId, true);
+                    }
                 });
             }
         }
@@ -593,13 +1112,15 @@ class ProfileDrustvo {
 
             alert('Pohod je bil uspešno izbrisan');
 
-            // Reset pagination and reload
-            this.currentPage = 1;
-            this.hasMore = true;
+            // Reset pagination and reload both sections
+            this.upcomingPage = 1;
+            this.pastPage = 1;
+            this.upcomingHasMore = true;
+            this.pastHasMore = true;
 
-            const user = Auth.getUser();
-            const drustvoId = this.drustvoId || user?.id;
-            await this.loadOrganiziraniPohodi(drustvoId);
+            const drustvoId = this.currentDrustvoId;
+            await this.loadUpcomingPohodi(drustvoId);
+            await this.loadPastPohodi(drustvoId);
         } catch (error) {
             console.error('Error deleting pohod:', error);
             alert('Napaka pri brisanju pohoda');

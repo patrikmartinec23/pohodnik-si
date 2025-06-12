@@ -29,6 +29,7 @@ class RegisterPohodnik {
             priimek: document.getElementById('priimek').value,
             datumRojstva: document.getElementById('datumRojstva').value,
             prebivalisce: document.getElementById('prebivalisce').value,
+            type: 'pohodnik', // Explicitly set the type
         };
 
         if (!this.validateInputs(formData)) {
@@ -39,7 +40,10 @@ class RegisterPohodnik {
             const result = await Auth.register(formData);
 
             if (result.success) {
-                window.location.href = '/pages/pohodi.html';
+                // Small delay to ensure localStorage is updated
+                setTimeout(() => {
+                    window.location.href = '/pages/pohodi.html';
+                }, 100);
             } else {
                 this.showError(result.error);
             }

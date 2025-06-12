@@ -3,6 +3,8 @@ const db = require('../config/db');
 class Pohod {
     static async getAll() {
         try {
+            const today = new Date().toISOString().split('T')[0];
+
             return await db('Pohod as p')
                 .select('p.*', 'pd.DrustvoIme as DrustvoIme')
                 .leftJoin(
@@ -10,7 +12,8 @@ class Pohod {
                     'p.TK_PohodniskoDrustvo',
                     'pd.IDPohodniskoDrustvo'
                 )
-                .orderBy('p.DatumPohoda', 'desc');
+                .where('p.DatumPohoda', '>=', today)
+                .orderBy('p.DatumPohoda', 'asc');
         } catch (error) {
             console.error('Error in getAll:', error);
             throw error;
@@ -113,6 +116,9 @@ class Pohod {
 
     static async getFiltered(filters = {}) {
         try {
+            // Get current date in YYYY-MM-DD format
+            const today = new Date().toISOString().split('T')[0];
+
             let query = db('Pohod as p')
                 .select(
                     'p.*',
@@ -123,7 +129,9 @@ class Pohod {
                     'PohodniskoDrustvo as pd',
                     'p.TK_PohodniskoDrustvo',
                     'pd.IDPohodniskoDrustvo'
-                );
+                )
+                // Only show future pohodi
+                .where('p.DatumPohoda', '>=', today);
 
             // Search by name or location
             if (filters.search) {
@@ -148,7 +156,7 @@ class Pohod {
                 );
             }
 
-            // Filter by date range
+            // Filter by date range (only if dateFrom is in the future)
             if (filters.dateFrom) {
                 query = query.where('p.DatumPohoda', '>=', filters.dateFrom);
             }
@@ -161,42 +169,12 @@ class Pohod {
                 query = query.where('p.ProstaMesta', '>', 0);
             }
 
-            // Default sorting
+            // Sort by date ascending (nearest first)
             query = query.orderBy('p.DatumPohoda', 'asc');
 
             return await query;
         } catch (error) {
             console.error('Error in getFiltered:', error);
-            throw error;
-        }
-    }
-
-    static async getByDrustvoWithPagination(drustvoId, page = 1, limit = 2) {
-        try {
-            const offset = (page - 1) * limit;
-
-            // Get total count first (this should remain consistent)
-            const totalResult = await db('Pohod')
-                .where('TK_PohodniskoDrustvo', drustvoId)
-                .count('* as total');
-
-            const total = parseInt(totalResult[0].total);
-
-            // Get paginated pohodi
-            const pohodi = await db('Pohod')
-                .where('TK_PohodniskoDrustvo', drustvoId)
-                .orderBy('DatumPohoda', 'desc')
-                .limit(limit)
-                .offset(offset);
-
-            return {
-                pohodi,
-                total,
-                currentPage: page,
-                hasMore: page * limit < total,
-            };
-        } catch (error) {
-            console.error('Error in getByDrustvoWithPagination:', error);
             throw error;
         }
     }
@@ -210,6 +188,107 @@ class Pohod {
         }
     }
 
+    static async registerForHike(pohodId, userId) {
+        try {
+            const pohodnik = await db('Pohodnik')
+                .where('TK_Uporabnik', userId)
+                .first();
+
+            if (!pohodnik) {
+                throw new Error('User is not a pohodnik');
+            }
+
+            // Get pohod details including organizing društvo
+            const pohod = await db('Pohod as p')
+                .select('p.*', 'pd.TK_Uporabnik as DrustvoUserId')
+                .leftJoin(
+                    'PohodniskoDrustvo as pd',
+                    'p.TK_PohodniskoDrustvo',
+                    'pd.IDPohodniskoDrustvo'
+                )
+                .where('p.IDPohod', pohodId)
+                .first();
+
+            if (!pohod) {
+                throw new Error('Pohod not found');
+            }
+
+            // Check if there are available spots BEFORE other checks
+            if (pohod.ProstaMesta <= 0) {
+                throw new Error('No spots available');
+            }
+
+            // Check if user is a member of the organizing društvo
+            const membership = await db('Clanarina')
+                .where('TK_Pohodnik', pohodnik.IDPohodnik)
+                .where('TK_PohodniskoDrustvo', pohod.TK_PohodniskoDrustvo)
+                .first();
+
+            if (!membership) {
+                throw new Error('User is not a member of organizing društvo');
+            }
+
+            // Check if already registered
+            const existingRegistration = await db('Prijava')
+                .where('TK_Pohod', pohodId)
+                .where('TK_Pohodnik', pohodnik.IDPohodnik)
+                .first();
+
+            if (existingRegistration) {
+                throw new Error('User is already registered for this hike');
+            }
+
+            // Register for the hike using a transaction
+            await db.transaction(async (trx) => {
+                // Double-check available spots within transaction to prevent race conditions
+                const currentPohod = await trx('Pohod')
+                    .where('IDPohod', pohodId)
+                    .select('ProstaMesta')
+                    .first();
+
+                if (currentPohod.ProstaMesta <= 0) {
+                    throw new Error('No spots available');
+                }
+
+                // Add registration
+                await trx('Prijava').insert({
+                    TK_Pohod: pohodId,
+                    TK_Pohodnik: pohodnik.IDPohodnik,
+                    DatumPrijave: new Date(),
+                });
+
+                // Decrease available spots
+                await trx('Pohod')
+                    .where('IDPohod', pohodId)
+                    .decrement('ProstaMesta', 1);
+            });
+
+            return true;
+        } catch (error) {
+            console.error('Error in registerForHike:', error);
+            throw error;
+        }
+    }
+
+    static async getRegisteredPohodniki(pohodId) {
+        try {
+            return await db('Prijava as pr')
+                .join('Pohodnik as p', 'pr.TK_Pohodnik', 'p.IDPohodnik')
+                .join('Uporabnik as u', 'p.TK_Uporabnik', 'u.IDUporabnik')
+                .where('pr.TK_Pohod', pohodId)
+                .select(
+                    'p.Ime',
+                    'p.Priimek',
+                    'u.UporabniskoIme',
+                    'pr.DatumPrijave'
+                )
+                .orderBy('pr.DatumPrijave', 'asc');
+        } catch (error) {
+            console.error('Error in getRegisteredPohodniki:', error);
+            throw error;
+        }
+    }
+
     static async getComments(pohodId) {
         try {
             return await db('Komentar as k')
@@ -219,8 +298,8 @@ class Pohod {
                 .select(
                     'k.IDKomentar',
                     'k.Komentar as content',
-                    'k.Ocena as rating',
-                    'u.UporabniskoIme as username' // Changed to match your schema
+                    'u.UporabniskoIme as username'
+                    // Remove rating selection
                 )
                 .orderBy('k.IDKomentar', 'desc');
         } catch (error) {
@@ -229,7 +308,7 @@ class Pohod {
         }
     }
 
-    static async addComment(pohodId, userId, content, rating) {
+    static async addComment(pohodId, userId, content) {
         try {
             const pohodnik = await db('Pohodnik')
                 .where('TK_Uporabnik', userId)
@@ -243,7 +322,7 @@ class Pohod {
                 TK_Pohod: pohodId,
                 TK_Pohodnik: pohodnik.IDPohodnik,
                 Komentar: content,
-                Ocena: rating || 5,
+                // Remove Ocena field
             });
 
             return id;
@@ -272,6 +351,145 @@ class Pohod {
                 .orderBy('DatumPohoda', 'asc');
         } catch (error) {
             console.error('Error in getUpcoming:', error);
+            throw error;
+        }
+    }
+
+    static async checkUserRegistration(pohodId, userId) {
+        try {
+            const pohodnik = await db('Pohodnik')
+                .where('TK_Uporabnik', userId)
+                .first();
+
+            if (!pohodnik) {
+                return false;
+            }
+
+            const registration = await db('Prijava')
+                .where('TK_Pohod', pohodId)
+                .where('TK_Pohodnik', pohodnik.IDPohodnik)
+                .first();
+
+            return !!registration;
+        } catch (error) {
+            console.error('Error in checkUserRegistration:', error);
+            throw error;
+        }
+    }
+
+    static async unregisterFromHike(pohodId, userId) {
+        try {
+            const pohodnik = await db('Pohodnik')
+                .where('TK_Uporabnik', userId)
+                .first();
+
+            if (!pohodnik) {
+                throw new Error('User is not a pohodnik');
+            }
+
+            const registration = await db('Prijava')
+                .where('TK_Pohod', pohodId)
+                .where('TK_Pohodnik', pohodnik.IDPohodnik)
+                .first();
+
+            if (!registration) {
+                throw new Error('User is not registered for this hike');
+            }
+
+            // Unregister from the hike using a transaction
+            await db.transaction(async (trx) => {
+                // Remove registration
+                await trx('Prijava')
+                    .where('TK_Pohod', pohodId)
+                    .where('TK_Pohodnik', pohodnik.IDPohodnik)
+                    .del();
+
+                // Increase available spots
+                await trx('Pohod')
+                    .where('IDPohod', pohodId)
+                    .increment('ProstaMesta', 1);
+            });
+
+            return true;
+        } catch (error) {
+            console.error('Error in unregisterFromHike:', error);
+            throw error;
+        }
+    }
+
+    static async getUpcomingByDrustvoWithPagination(
+        drustvoId,
+        page = 1,
+        limit = 2
+    ) {
+        try {
+            const offset = (page - 1) * limit;
+            const today = new Date().toISOString().split('T')[0];
+
+            // Get total count of upcoming pohodi
+            const totalResult = await db('Pohod')
+                .where('TK_PohodniskoDrustvo', drustvoId)
+                .where('DatumPohoda', '>', today)
+                .count('* as total');
+
+            const total = parseInt(totalResult[0].total);
+
+            // Get paginated upcoming pohodi
+            const pohodi = await db('Pohod')
+                .where('TK_PohodniskoDrustvo', drustvoId)
+                .where('DatumPohoda', '>', today)
+                .orderBy('DatumPohoda', 'asc')
+                .limit(limit)
+                .offset(offset);
+
+            return {
+                pohodi,
+                total,
+                currentPage: page,
+                hasMore: page * limit < total,
+            };
+        } catch (error) {
+            console.error(
+                'Error in getUpcomingByDrustvoWithPagination:',
+                error
+            );
+            throw error;
+        }
+    }
+
+    static async getPastByDrustvoWithPagination(
+        drustvoId,
+        page = 1,
+        limit = 2
+    ) {
+        try {
+            const offset = (page - 1) * limit;
+            const today = new Date().toISOString().split('T')[0];
+
+            // Get total count of past pohodi
+            const totalResult = await db('Pohod')
+                .where('TK_PohodniskoDrustvo', drustvoId)
+                .where('DatumPohoda', '<=', today)
+                .count('* as total');
+
+            const total = parseInt(totalResult[0].total);
+
+            // Get paginated past pohodi
+            const pohodi = await db('Pohod')
+                .where('TK_PohodniskoDrustvo', drustvoId)
+                .where('DatumPohoda', '<=', today)
+                .orderBy('DatumPohoda', 'desc')
+                .limit(limit)
+                .offset(offset);
+
+            return {
+                pohodi,
+                total,
+                currentPage: page,
+                hasMore: page * limit < total,
+            };
+        } catch (error) {
+            console.error('Error in getPastByDrustvoWithPagination:', error);
             throw error;
         }
     }

@@ -25,7 +25,6 @@ class MembershipRequest {
 
     static async create(drustvoId, userId) {
         try {
-            // First, find the pohodnik record using the user ID
             const pohodnik = await db('Pohodnik')
                 .where('TK_Uporabnik', userId)
                 .first();
@@ -34,10 +33,9 @@ class MembershipRequest {
                 throw new Error('Pohodnik profile not found for this user');
             }
 
-            // Use the actual IDPohodnik, not the TK_Uporabnik
             return await db('Zahteve_za_vclanitev').insert({
                 TK_PohodniskoDrustvo: drustvoId,
-                TK_Pohodnik: pohodnik.IDPohodnik, // This should be 7, not 13
+                TK_Pohodnik: pohodnik.IDPohodnik,
                 DatumZahteve: new Date(),
                 Dogajanje: 'V obdelavi',
             });
@@ -65,6 +63,7 @@ class MembershipRequest {
                 });
 
             if (action === 'accept') {
+                // Add to Clanarina table (WITHOUT Dogajanje field)
                 await trx('Clanarina').insert({
                     TK_PohodniskoDrustvo: request.TK_PohodniskoDrustvo,
                     TK_Pohodnik: request.TK_Pohodnik,
@@ -80,6 +79,7 @@ class MembershipRequest {
         }
     }
 
+    // Remove the duplicate method and keep only this one
     static async checkMembershipStatus(drustvoId, userId) {
         try {
             const pohodnik = await db('Pohodnik')
@@ -107,12 +107,33 @@ class MembershipRequest {
                 })
                 .first();
 
-            return {
+            const result = {
                 isMember: !!membership,
                 hasPendingRequest: !!pendingRequest,
             };
+
+            return result;
         } catch (error) {
             console.error('Error in checkMembershipStatus:', error);
+            throw error;
+        }
+    }
+
+    static async checkMembershipStatusByUserId(drustvoUserId, userId) {
+        try {
+            let actualDrustvoId = drustvoUserId;
+
+            const drustvo = await db('PohodniskoDrustvo')
+                .where('TK_Uporabnik', drustvoUserId)
+                .first();
+
+            if (drustvo) {
+                actualDrustvoId = drustvo.IDPohodniskoDrustvo;
+            }
+
+            return await this.checkMembershipStatus(actualDrustvoId, userId);
+        } catch (error) {
+            console.error('Error in checkMembershipStatusByUserId:', error);
             throw error;
         }
     }

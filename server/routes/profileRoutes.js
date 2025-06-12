@@ -4,6 +4,7 @@ const auth = require('../middleware/auth');
 const Profile = require('../models/Profile');
 const MembershipRequest = require('../models/MembershipRequest');
 const Pohod = require('../models/Pohod');
+const DrustvoRating = require('../models/DrustvoRating');
 
 // Get user profile
 router.get('/api/users/:id', auth, async (req, res) => {
@@ -133,24 +134,6 @@ router.post(
     }
 );
 
-// Check membership status
-router.get(
-    '/api/drustvo/:drustvoId/membership-status',
-    auth,
-    async (req, res) => {
-        try {
-            const status = await MembershipRequest.checkMembershipStatus(
-                req.params.drustvoId,
-                req.user.id
-            );
-            res.json(status);
-        } catch (error) {
-            console.error('Error checking membership status:', error);
-            res.status(500).json({ error: 'Server error' });
-        }
-    }
-);
-
 // Leave membership
 router.post(
     '/api/drustvo/:drustvoId/leave-membership',
@@ -169,12 +152,30 @@ router.post(
     }
 );
 
-router.get('/api/drustvo/:drustvoId/pohodi', async (req, res) => {
+router.get(
+    '/api/drustvo/:drustvoId/membership-status',
+    auth,
+    async (req, res) => {
+        try {
+            const status = await MembershipRequest.checkMembershipStatus(
+                req.params.drustvoId,
+                req.user.id
+            );
+            res.json(status);
+        } catch (error) {
+            console.error('Error checking membership status:', error);
+            res.status(500).json({ error: 'Server error' });
+        }
+    }
+);
+
+// Get upcoming pohodi for drustvo
+router.get('/api/drustvo/:drustvoId/pohodi/upcoming', async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 2;
 
-        const result = await Pohod.getByDrustvoWithPagination(
+        const result = await Pohod.getUpcomingByDrustvoWithPagination(
             req.params.drustvoId,
             page,
             limit
@@ -182,7 +183,118 @@ router.get('/api/drustvo/:drustvoId/pohodi', async (req, res) => {
 
         res.json(result);
     } catch (error) {
-        console.error('Error fetching drustvo pohodi:', error);
+        console.error('Error fetching upcoming drustvo pohodi:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// Get past pohodi for drustvo
+router.get('/api/drustvo/:drustvoId/pohodi/past', async (req, res) => {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 2;
+
+        const result = await Pohod.getPastByDrustvoWithPagination(
+            req.params.drustvoId,
+            page,
+            limit
+        );
+
+        res.json(result);
+    } catch (error) {
+        console.error('Error fetching past drustvo pohodi:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+router.get('/api/drustvo/:drustvoId/ratings', async (req, res) => {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 5;
+
+        const result = await DrustvoRating.getRatings(
+            req.params.drustvoId,
+            page,
+            limit
+        );
+        res.json(result);
+    } catch (error) {
+        console.error('Error fetching drustvo ratings:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// Get drustvo average rating
+router.get('/api/drustvo/:drustvoId/average-rating', async (req, res) => {
+    try {
+        const result = await DrustvoRating.getAverageRating(
+            req.params.drustvoId
+        );
+        res.json(result);
+    } catch (error) {
+        console.error('Error fetching average rating:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// Add or update rating
+router.post('/api/drustvo/:drustvoId/rating', auth, async (req, res) => {
+    try {
+        const { rating, comment } = req.body;
+
+        if (!rating || rating < 1 || rating > 5) {
+            return res
+                .status(400)
+                .json({ error: 'Rating must be between 1 and 5' });
+        }
+
+        // Check if user can rate
+        const canRate = await DrustvoRating.checkCanRate(
+            req.params.drustvoId,
+            req.user.id
+        );
+        if (!canRate.canRate) {
+            return res.status(403).json({ error: canRate.reason });
+        }
+
+        const id = await DrustvoRating.addRating(
+            req.params.drustvoId,
+            req.user.id,
+            rating,
+            comment
+        );
+
+        res.status(201).json({ success: true, id });
+    } catch (error) {
+        console.error('Error adding rating:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// Get user's rating for a drustvo
+router.get('/api/drustvo/:drustvoId/my-rating', auth, async (req, res) => {
+    try {
+        const rating = await DrustvoRating.getUserRating(
+            req.params.drustvoId,
+            req.user.id
+        );
+        res.json(rating || {});
+    } catch (error) {
+        console.error('Error fetching user rating:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// Check if user can rate
+router.get('/api/drustvo/:drustvoId/can-rate', auth, async (req, res) => {
+    try {
+        const result = await DrustvoRating.checkCanRate(
+            req.params.drustvoId,
+            req.user.id
+        );
+        res.json(result);
+    } catch (error) {
+        console.error('Error checking can rate:', error);
         res.status(500).json({ error: 'Server error' });
     }
 });
