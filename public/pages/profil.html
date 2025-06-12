@@ -38,6 +38,7 @@
                                         class="card-title h4 mb-4"
                                         id="userUsername"
                                     ></h3>
+                                    <p class="text-muted mb-3">Pohodnik</p>
                                     <hr
                                         class="hr-heading-secondary w-75 mx-auto"
                                     />
@@ -95,58 +96,115 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="col-lg-8">
-                            <!-- Statistics -->
-                            <div class="card bg-light shadow-sm mb-4">
+                            <!-- Statistics - MOVED BACK UP -->
+                            <div class="card shadow-sm bg-light mt-4">
                                 <div class="card-body">
-                                    <h4 class="card-title mb-4">Statistika</h4>
-                                    <div class="row text-center">
-                                        <div class="col-md-4 mb-3">
+                                    <h5 class="card-title mb-3">Statistika</h5>
+                                    <div class="text-center mb-3">
+                                        <div class="badge-container mb-3">
+                                            <span
+                                                class="badge fs-6 py-2 px-3"
+                                                id="userBadge"
+                                            >
+                                                <!-- Badge will be loaded here -->
+                                            </span>
+                                        </div>
+                                        <div class="hikes-stat">
                                             <h3
-                                                class="h2 text-primary"
+                                                class="text-primary mb-0"
                                                 id="totalHikes"
                                             >
                                                 0
                                             </h3>
-                                            <p class="text-muted">
-                                                Opravljeni pohodi
-                                            </p>
-                                        </div>
-                                        <div class="col-md-4 mb-3">
-                                            <h3
-                                                class="h2 text-success"
-                                                id="totalAltitude"
+                                            <small class="text-muted"
+                                                >Opravljenih pohodov</small
                                             >
-                                                0
-                                            </h3>
-                                            <p class="text-muted">
-                                                Skupna višina (m)
-                                            </p>
-                                        </div>
-                                        <div class="col-md-4 mb-3">
-                                            <h3
-                                                class="h2 text-info"
-                                                id="totalTime"
-                                            >
-                                                0
-                                            </h3>
-                                            <p class="text-muted">
-                                                Skupni čas (h)
-                                            </p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Upcoming Hikes -->
-                            <div class="card bg-light shadow-sm">
+                            <!-- Personal Details -->
+                            <div class="card shadow-sm bg-light mt-4">
                                 <div class="card-body">
-                                    <h4 class="card-title mb-4">
-                                        Prihajajoči pohodi
-                                    </h4>
-                                    <div id="upcomingHikes"></div>
+                                    <h5 class="card-title mb-3">
+                                        Osebni podatki
+                                    </h5>
+                                    <ul class="list-unstyled">
+                                        <li class="mb-2">
+                                            <i
+                                                class="fas fa-user text-primary me-2"
+                                            ></i>
+                                            <span id="userNameDetails"
+                                                >Ime Priimek</span
+                                            >
+                                        </li>
+                                        <li class="mb-2">
+                                            <i
+                                                class="fas fa-birthday-cake text-primary me-2"
+                                            ></i>
+                                            <span id="userBirthdayDetails"
+                                                >01.01.1990</span
+                                            >
+                                        </li>
+                                        <li class="mb-2">
+                                            <i
+                                                class="fas fa-map-marker-alt text-primary me-2"
+                                            ></i>
+                                            <span id="userLocationDetails"
+                                                >Ljubljana</span
+                                            >
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- Memberships -->
+                            <div class="card shadow-sm bg-light mt-4">
+                                <div class="card-body">
+                                    <h5 class="card-title mb-3">
+                                        <i
+                                            class="fas fa-users me-2 text-primary"
+                                        ></i
+                                        >Članstva
+                                    </h5>
+                                    <div id="userMemberships">
+                                        <!-- Memberships will be loaded here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Column -->
+                        <div class="col-lg-8">
+                            <!-- Upcoming Hikes -->
+                            <div class="card shadow-sm bg-light mb-4">
+                                <div class="card-body">
+                                    <h5 class="card-title mb-4">
+                                        <i
+                                            class="fas fa-calendar-plus me-2 text-success"
+                                        ></i
+                                        >Prihajajoči pohodi
+                                    </h5>
+                                    <div id="upcomingHikes">
+                                        <!-- Upcoming hikes will be loaded here -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Past Hikes -->
+                            <div class="card shadow-sm bg-light">
+                                <div class="card-body">
+                                    <h5 class="card-title mb-4">
+                                        <i
+                                            class="fas fa-history me-2 text-secondary"
+                                        ></i
+                                        >Pretekli pohodi
+                                    </h5>
+                                    <div id="pastHikes">
+                                        <!-- Past hikes will be loaded here -->
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -160,6 +218,7 @@
         <script src="../utils/Auth.js"></script>
         <script src="../components/Navbar.js"></script>
         <script src="../components/Footer.js"></script>
+        <script src="../js/script.js"></script>
         <script src="../js/bootstrap.bundle.min.js"></script>
         <script src="../components/Profile.js"></script>
         <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>

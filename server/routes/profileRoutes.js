@@ -299,4 +299,28 @@ router.get('/api/drustvo/:drustvoId/can-rate', auth, async (req, res) => {
     }
 });
 
+router.get('/api/users/:id/memberships', auth, async (req, res) => {
+    try {
+        const memberships = await Profile.getUserMemberships(req.params.id);
+        res.json(memberships);
+    } catch (error) {
+        console.error('Error fetching user memberships:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// Get past hikes for user
+router.get('/api/users/:id/past-hikes', auth, async (req, res) => {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 2;
+
+        const result = await Profile.getPastHikes(req.params.id, page, limit);
+        res.json(result);
+    } catch (error) {
+        console.error('Error fetching past hikes:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
 module.exports = router;

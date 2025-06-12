@@ -118,6 +118,11 @@ class Pohod {
         </a>`;
         }
 
+        // Add this for image handling
+        const imageUrl = pohod.SlikanaslovnicaFilename
+            ? `../images/pohodi/${pohod.SlikanaslovnicaFilename}`
+            : '../images/default-pohod.jpg';
+
         this.container.innerHTML = `
             <section class="pohod-detail mb-4">
                 <div class="container">
@@ -160,9 +165,9 @@ class Pohod {
                         <!-- Left Column -->
                         <div class="col-lg-8 mb-4">
                             <div class="card shadow-sm">
-                                <img src="../images/project-1.jpg" 
-                                     class="card-img-top" 
-                                     alt="${pohod.Lokacija}"
+                                <img src="${imageUrl}" class="img-fluid rounded" alt="${
+            pohod.PohodIme
+        }" 
                                      onerror="this.src='../images/default-pohod.jpg'">
                                 <div class="card-body">
                                     <h3 class="h4 mb-3">Opis pohoda</h3>

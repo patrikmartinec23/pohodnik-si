@@ -14,46 +14,7 @@
     </head>
     <body>
         <div id="navbar"></div>
-
-        <div id="main-content" class="mt-6">
-            <section class="drustva py-5">
-                <div class="container">
-                    <div class="row mb-4">
-                        <div
-                            class="col-12 d-flex flex-column align-items-start"
-                        >
-                            <h2 class="fw-bold">Pohodniška društva</h2>
-                            <hr class="hr-heading-primary w-25" />
-                        </div>
-                    </div>
-
-                    <div class="row mb-4" data-aos="fade-down">
-                        <div class="col-md-8 mb-2">
-                            <input
-                                type="text"
-                                id="searchInput"
-                                class="form-control"
-                                placeholder="Išči društva po imenu..."
-                            />
-                        </div>
-                        <div class="col-md-4 mb-2">
-                            <select id="regionFilter" class="form-select">
-                                <option value="">Vse regije</option>
-                                <option value="gorenjska">Gorenjska</option>
-                                <option value="primorska">Primorska</option>
-                                <option value="štajerska">Štajerska</option>
-                                <option value="dolenjska">Dolenjska</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="row" id="clubList">
-                        <!-- Društva will be loaded here dynamically -->
-                    </div>
-                </div>
-            </section>
-        </div>
-
+        <div id="main-content" class="mt-6"></div>
         <div id="footer"></div>
 
         <script src="../utils/Auth.js"></script>
@@ -62,9 +23,5 @@
         <script src="../components/Drustva.js"></script>
         <script src="../js/script.js"></script>
         <script src="../js/bootstrap.bundle.min.js"></script>
-        <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-        <script>
-            AOS.init();
-        </script>
     </body>
 </html>

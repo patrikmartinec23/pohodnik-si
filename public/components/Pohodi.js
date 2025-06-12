@@ -77,6 +77,12 @@ class Pohodi {
                 ? pohod.ZbirnoMesto.substring(0, 17) + '...'
                 : pohod.ZbirnoMesto;
 
+        // Generate image URL based on pohod ID
+        let imageUrl = '../images/default-pohod.jpg';
+        if (pohod.SlikanaslovnicaFilename) {
+            imageUrl = `../images/pohodi/${pohod.SlikanaslovnicaFilename}`;
+        }
+
         return `
         <div class="col-md-4 mb-4" 
              data-difficulty="${pohod.Tezavnost}"
@@ -84,7 +90,7 @@ class Pohodi {
              data-date="${date}">
             <div class="card pohod-card bg-light hover-shadow">
                 <a href="pohod.html?id=${pohod.IDPohod}" class="text-decoration-none">
-                    <img src="../images/project-1.jpg" 
+                    <img src="${imageUrl}" 
                          alt="${pohod.PohodIme}" 
                          class="card-img-top" 
                          onerror="this.src='../images/default-pohod.jpg'" />

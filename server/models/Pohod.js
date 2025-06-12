@@ -69,12 +69,15 @@ class Pohod {
                 }
             }
 
+            // Remove pohodSlika from the data if it exists (it's not in the DB schema)
+            const { pohodSlika, ...dataToSave } = pohodData;
+
             const [id] = await db('Pohod').insert({
-                ...pohodData,
-                DatumPohoda: new Date(pohodData.DatumPohoda),
-                StroskiPrevoza: parseFloat(pohodData.StroskiPrevoza),
-                ProstaMesta: parseInt(pohodData.ProstaMesta),
-                Tezavnost: parseInt(pohodData.Tezavnost),
+                ...dataToSave,
+                DatumPohoda: new Date(dataToSave.DatumPohoda),
+                StroskiPrevoza: parseFloat(dataToSave.StroskiPrevoza),
+                ProstaMesta: parseInt(dataToSave.ProstaMesta),
+                Tezavnost: parseInt(dataToSave.Tezavnost),
             });
             return id;
         } catch (error) {

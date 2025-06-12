@@ -9,28 +9,59 @@ class NavbarComponent {
                 text: 'pohodnik.si',
             },
             links: [
-                { text: 'Domov', href: 'index.html#', active: true },
-                { text: 'Pohodi', href: './pohodi.html', active: false },
-                { text: 'Društva', href: './drustva.html', active: false },
-            ],
-
-            socialLinks: [
                 {
-                    platform: 'facebook',
-                    url: 'https://facebook.com',
-                    icon: 'fab fa-facebook-f',
+                    text: 'Domov',
+                    href: 'index.html',
+                    active: true,
+                    icon: 'fas fa-home',
                 },
                 {
-                    platform: 'twitter',
-                    url: 'https://twitter.com',
-                    icon: 'fab fa-x-twitter',
+                    text: 'Pohodi',
+                    href: './pohodi.html',
+                    active: false,
+                    icon: 'fas fa-hiking',
+                },
+                {
+                    text: 'Društva',
+                    href: './drustva.html',
+                    active: false,
+                    icon: 'fas fa-users',
                 },
             ],
         };
+
+        this.setActiveLink();
+    }
+
+    setActiveLink() {
+        const currentPath = window.location.pathname;
+        this.navData.links = this.navData.links.map((link) => {
+            // Remove the './' from href if it exists
+            const cleanHref = link.href.replace('./', '');
+            // Remove 'index.html#' special case
+            const comparePath = currentPath.endsWith('/')
+                ? 'index.html'
+                : currentPath.split('/').pop();
+
+            link.active =
+                cleanHref === comparePath ||
+                (comparePath === '' && cleanHref === 'index.html#');
+            return link;
+        });
+
+        if (
+            currentPath.includes('profil-drustvo.html') ||
+            currentPath.includes('pages/profil.html')
+        ) {
+            this.navData.links = this.navData.links.map((link) => {
+                link.active = false;
+                return link;
+            });
+        }
     }
 
     render() {
-        const { brand, links, socialLinks } = this.navData;
+        const { brand, links } = this.navData;
         const user = Auth.getUser();
 
         this.container.innerHTML = `
@@ -43,8 +74,7 @@ class NavbarComponent {
                         ${brand.text}
                     </a>
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
-                            data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" 
-                            aria-expanded="false" aria-label="Toggle navigation">
+                            data-bs-target="#navbarNavDropdown">
                         <span class="navbar-toggler-icon"></span>
                     </button>
                     <div class="collapse navbar-collapse" id="navbarNavDropdown">
@@ -52,8 +82,8 @@ class NavbarComponent {
                             ${links
                                 .map(
                                     (link) => `
-                                <li class="nav-item">
-                                    <a class="nav-link ${
+                                <li class="nav-item text-center">
+                                    <a class="nav-link d-flex flex-column align-items-center ${
                                         link.active ? 'active' : ''
                                     }" 
                                        ${
@@ -61,7 +91,10 @@ class NavbarComponent {
                                                ? 'aria-current="page"'
                                                : ''
                                        }
-                                       href="${link.href}">${link.text}</a>
+                                       href="${link.href}">
+                                        <i class="${link.icon} mb-1"></i>
+                                        <small>${link.text}</small>
+                                    </a>
                                 </li>
                             `
                                 )
@@ -70,40 +103,36 @@ class NavbarComponent {
                             ${
                                 user
                                     ? `
-        <li class="nav-item">
-            <a class="nav-link" href="./${
-                user.type === 'drustvo' ? 'profil-drustvo.html' : 'profil.html'
-            }">
-                <i class="fas fa-user me-1"></i>${user.username}
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link text-warning" href="#" onclick="Auth.logout()">
-                <i class="fas fa-sign-out-alt me-1"></i>Odjava
-            </a>
-        </li>
-    `
+                                <li class="nav-item text-center">
+                                    <a class="nav-link d-flex flex-column align-items-center" 
+                                       href="./${
+                                           user.type === 'drustvo'
+                                               ? 'profil-drustvo.html'
+                                               : 'profil.html'
+                                       }">
+                                        <i class="fas fa-user mb-1"></i>
+                                        <small>${user.username}</small>
+                                    </a>
+                                </li>
+                                <li class="nav-item text-center">
+                                    <a class="nav-link d-flex flex-column align-items-center text-warning" 
+                                       href="#" onclick="Auth.logout()">
+                                        <i class="fas fa-sign-out-alt mb-1"></i>
+                                        <small>Odjava</small>
+                                    </a>
+                                </li>
+                            `
                                     : `
-        <li class="nav-item">
-            <a class="nav-link" href="./prijava.html">Prijavi Se</a>
-        </li>
-    `
+                                <li class="nav-item text-center">
+                                    <a class="nav-link d-flex flex-column align-items-center" 
+                                       href="./prijava.html">
+                                        <i class="fas fa-sign-in-alt mb-1"></i>
+                                        <small>Prijavi Se</small>
+                                    </a>
+                                </li>
+                            `
                             }
                         </ul>
-                        <span class="nav-item">
-                            ${socialLinks
-                                .map(
-                                    (social) => `
-                                <span class="fa-stack">
-                                    <a href="${social.url}" target="_blank">
-                                        <i class="fas fa-circle fa-stack-2x"></i>
-                                        <i class="${social.icon} fa-stack-1x text-white"></i>
-                                    </a>
-                                </span>
-                            `
-                                )
-                                .join('')}
-                        </span>
                     </div>
                 </div>
             </nav>

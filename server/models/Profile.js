@@ -15,11 +15,12 @@ class Profile {
                 .where('u.IDUporabnik', userId)
                 .first();
 
+            // Get statistics
+            const stats = await this.getUserStatistics(userId);
+
             return {
                 ...profile,
-                totalHikes: 0,
-                totalAltitude: 0,
-                totalHours: 0,
+                ...stats,
             };
         } catch (error) {
             console.error('Error in getUserProfile:', error);
@@ -113,26 +114,49 @@ class Profile {
             if (!pohodnik) {
                 return {
                     totalHikes: 0,
-                    totalAltitude: 0,
-                    totalHours: 0,
+                    badge: 'Turist',
                 };
             }
 
-            // Get statistics from Prijava and Pohod tables
-            const stats = await db('Prijava as pr')
+            // Get past hikes count (completed hikes)
+            const today = new Date().toISOString().split('T')[0];
+            const oneYearAgo = new Date();
+            oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+            const oneYearAgoStr = oneYearAgo.toISOString().split('T')[0];
+
+            // Count total past hikes
+            const totalHikesResult = await db('Prijava as pr')
                 .join('Pohod as p', 'pr.TK_Pohod', 'p.IDPohod')
                 .where('pr.TK_Pohodnik', pohodnik.IDPohodnik)
-                .select(
-                    db.raw('COUNT(DISTINCT pr.TK_Pohod) as totalHikes'),
-                    db.raw('SUM(p.Visina) as totalAltitude'),
-                    db.raw('SUM(p.CasHoje) as totalHours')
-                )
+                .where('p.DatumPohoda', '<', today)
+                .count('* as total')
                 .first();
 
+            // Count hikes in the last year for badge calculation
+            const lastYearHikesResult = await db('Prijava as pr')
+                .join('Pohod as p', 'pr.TK_Pohod', 'p.IDPohod')
+                .where('pr.TK_Pohodnik', pohodnik.IDPohodnik)
+                .where('p.DatumPohoda', '<', today)
+                .where('p.DatumPohoda', '>=', oneYearAgoStr)
+                .count('* as total')
+                .first();
+
+            const totalHikes = parseInt(totalHikesResult.total) || 0;
+            const lastYearHikes = parseInt(lastYearHikesResult.total) || 0;
+
+            // Determine badge based on last year's hikes
+            let badge = 'Turist';
+            if (lastYearHikes > 100) {
+                badge = 'Gorski gams';
+            } else if (lastYearHikes > 50) {
+                badge = 'Resni planinec';
+            } else if (lastYearHikes > 10) {
+                badge = 'Pohodnik';
+            }
+
             return {
-                totalHikes: stats.totalHikes || 0,
-                totalAltitude: stats.totalAltitude || 0,
-                totalHours: stats.totalHours || 0,
+                totalHikes,
+                badge,
             };
         } catch (error) {
             console.error('Error in getUserStatistics:', error);
@@ -163,6 +187,88 @@ class Profile {
             };
         } catch (error) {
             console.error('Error in getDrustvoProfile:', error);
+            throw error;
+        }
+    }
+    static async getUserMemberships(userId) {
+        try {
+            const pohodnik = await db('Pohodnik')
+                .where('TK_Uporabnik', userId)
+                .first();
+
+            if (!pohodnik) {
+                return [];
+            }
+
+            return await db('Clanarina as c')
+                .join(
+                    'PohodniskoDrustvo as pd',
+                    'c.TK_PohodniskoDrustvo',
+                    'pd.IDPohodniskoDrustvo'
+                )
+                .where('c.TK_Pohodnik', pohodnik.IDPohodnik)
+                .select(
+                    'pd.IDPohodniskoDrustvo',
+                    'pd.DrustvoIme',
+                    'pd.Naslov',
+                    'pd.TK_Uporabnik as DrustvoUserId'
+                )
+                .orderBy('pd.DrustvoIme', 'asc');
+        } catch (error) {
+            console.error('Error in getUserMemberships:', error);
+            throw error;
+        }
+    }
+
+    static async getPastHikes(userId, page = 1, limit = 2) {
+        try {
+            const pohodnik = await db('Pohodnik')
+                .where('TK_Uporabnik', userId)
+                .first();
+
+            if (!pohodnik) {
+                return { hikes: [], total: 0 };
+            }
+
+            const today = new Date().toISOString().split('T')[0];
+            const offset = (page - 1) * limit;
+
+            // Get total count
+            const [{ total }] = await db('Prijava as pr')
+                .join('Pohod as p', 'pr.TK_Pohod', 'p.IDPohod')
+                .where('pr.TK_Pohodnik', pohodnik.IDPohodnik)
+                .where('p.DatumPohoda', '<', today)
+                .count('* as total');
+
+            // Get paginated past hikes
+            const hikes = await db('Prijava as pr')
+                .join('Pohod as p', 'pr.TK_Pohod', 'p.IDPohod')
+                .leftJoin(
+                    'PohodniskoDrustvo as pd',
+                    'p.TK_PohodniskoDrustvo',
+                    'pd.IDPohodniskoDrustvo'
+                )
+                .select(
+                    'p.IDPohod',
+                    'p.PohodIme',
+                    'p.DatumPohoda',
+                    'p.Tezavnost',
+                    'p.Lokacija',
+                    'p.Trajanje',
+                    'p.ZbirnoMesto',
+                    'p.PohodOpis',
+                    'pd.DrustvoIme',
+                    'pr.DatumPrijave'
+                )
+                .where('pr.TK_Pohodnik', pohodnik.IDPohodnik)
+                .where('p.DatumPohoda', '<', today)
+                .orderBy('p.DatumPohoda', 'desc')
+                .limit(limit)
+                .offset(offset);
+
+            return { hikes, total };
+        } catch (error) {
+            console.error('Error in getPastHikes:', error);
             throw error;
         }
     }

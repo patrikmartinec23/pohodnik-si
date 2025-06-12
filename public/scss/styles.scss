@@ -84,7 +84,74 @@ body {
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     opacity: 0.85;
   }
+
+  .navbar-nav {
+        gap: 1.5rem; // Adds gap between nav items
+        
+        .nav-item {
+            .nav-link {
+                small {
+                    font-size: 0.9rem; 
+                }
+            }
+        }
+    }
+
+    // Add margin to create separation between main nav items and profile section
+    .nav-item:nth-child(3) {
+        margin-right: 2rem; // Adds space after "Društva" link
+    }
+
+    @media (max-width: 991px) {
+        .navbar-nav {
+            gap: 0.75rem; // Smaller gap on mobile
+        }
+        
+        .nav-item:nth-child(3) {
+            margin-right: 1rem; // Smaller margin on mobile
+        }
+    }
+
+  .nav-link {
+        padding: 0.5rem 1rem;
+        
+        i {
+            font-size: 1.5rem;
+        }
+        
+        small {
+            font-size: 0.75rem;
+        }
+    }
+    
+    @media (max-width: 991px) {
+        .nav-link {
+            flex-direction: row !important;
+            justify-content: center;
+            align-items: center;
+            
+            i {
+                margin-right: 0.7rem;
+                margin-bottom: 0 !important;
+            }
+        }
+    }
 }
+
+.navbar {
+    .nav-item {
+        .nav-link {
+            &.active {
+                background-color: rgba(255, 255, 255, 0.1);
+                border-radius: 0.25rem;
+                
+
+            }
+        }
+    }
+}
+
+
 
 // Cards
 .card {
@@ -225,6 +292,41 @@ textarea {
 }
 
 // Rating
+.rating-display {
+  display: inline-flex;
+  align-items: center;
+  
+  .fas, .far, .fa-star-half-alt {
+    font-size: 1rem;
+  }
+}
+
+.average-rating {
+  text-align: center;
+  
+  .rating-display {
+    justify-content: center;
+    
+    .fas, .far, .fa-star-half-alt {
+      font-size: 1.5rem;
+    }
+  }
+}
+
+// Fix star input styling
+.rating {
+  input:not(:checked) ~ label:hover,
+  input:not(:checked) ~ label:hover ~ label {
+    color: #ffd700;
+  }
+  
+  label {
+    .fas {
+      transition: color 0.2s ease;
+    }
+  }
+}
+
 .rating {
   display: flex;
   flex-direction: row-reverse;
@@ -256,6 +358,42 @@ textarea {
   color: #ffc107;
   margin-right: 0.1rem;
 }
+
+.rating-input {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: flex-start;
+  
+  input[type="radio"] {
+    display: none;
+    
+    &:checked ~ label .fas,
+    &:hover ~ label .fas {
+      color: #ffc107;
+    }
+  }
+  
+  label.star {
+    cursor: pointer;
+    padding: 0 0.2em;
+    
+    .fas {
+      color: #ddd;
+      font-size: 1.5em;
+      transition: color 0.2s ease;
+    }
+    
+    &:hover .fas,
+    &:hover ~ label .fas {
+      color: #ffc107;
+    }
+  }
+}
+
+// Make sure checked stars stay gold
+.rating-input input[type="radio"]:checked ~ label .fas {
+  color: #ffc107;
+} 
 
 .rating-display .fa-star.far {
   color: #ddd;
@@ -385,6 +523,46 @@ textarea {
   font-size: 65px;
 }
 
+.badge-container {
+    .badge {
+        font-weight: 600;
+        border-radius: 20px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        
+        &.bg-warning {
+            background: linear-gradient(135deg, #ffc107 0%, #ff8f00 100%) !important;
+            color: #000 !important;
+        }
+        
+        &.bg-danger {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;
+        }
+        
+        &.bg-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+        }
+        
+        &.bg-secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%) !important;
+        }
+    }
+}
+
+.hikes-stat {
+    h3 {
+        font-size: 2.5rem;
+        font-weight: bold;
+    }
+    
+    small {
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+}
+
 @media (max-width: 992px) {
   .xl-text {
     font-size: 45px;
@@ -395,5 +573,13 @@ textarea {
   .xl-text {
     font-size: 45px;
   }
+  .badge-container .badge {
+        font-size: 0.875rem !important;
+        padding: 0.5rem 1rem !important;
+    }
+    
+    .hikes-stat h3 {
+        font-size: 2rem;
+    }
 }
 

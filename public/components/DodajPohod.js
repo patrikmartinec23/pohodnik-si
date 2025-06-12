@@ -104,6 +104,18 @@ class DodajPohod {
                                         <div class="col-md-12 mb-4">
                                             <h5 class="text-primary mb-3">Osnovne informacije</h5>
                                         </div>
+
+                                        <div class="col-md-12 mb-3">
+    <label for="pohodSlika" class="form-label">Slika pohoda</label>
+    <div class="input-group">
+        <input type="file" class="form-control" id="pohodSlika" name="pohodSlika" accept="image/*">
+        <button class="btn btn-outline-secondary" type="button" id="clearImageBtn">Odstrani</button>
+    </div>
+    <small class="text-muted">Priporočena velikost: 800×600px, format: JPG, PNG (max 2MB)</small>
+    <div class="mt-2" id="imagePreviewContainer" style="display:none;">
+        <img id="imagePreview" class="img-fluid img-thumbnail" style="max-height: 200px;" />
+    </div>
+</div>
                                         
                                         <div class="col-md-6 mb-3">
                                             <label for="pohodIme" class="form-label">Ime pohoda *</label>
@@ -232,70 +244,87 @@ class DodajPohod {
         `;
     }
 
-    async handleSubmit(e) {
-        e.preventDefault();
-
-        const formData = new FormData(e.target);
-        const data = Object.fromEntries(formData);
-
-        // Get user's društvo ID
-        const user = Auth.getUser();
-        try {
-            const drustvoResponse = await fetch(`/api/drustvo/${user.id}`);
-            const drustvo = await drustvoResponse.json();
-            data.TK_PohodniskoDrustvo = drustvo.IDPohodniskoDrustvo;
-        } catch (error) {
-            alert('Napaka pri pridobivanju podatkov o društvu');
-            return;
-        }
-
-        try {
-            const url = this.isEdit
-                ? `/api/pohodi/${this.pohodId}`
-                : '/api/pohodi';
-            const method = this.isEdit ? 'PUT' : 'POST';
-
-            const response = await fetch(url, {
-                method: method,
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data),
-            });
-
-            if (!response.ok) {
-                throw new Error(
-                    `Failed to ${this.isEdit ? 'update' : 'create'} pohod`
-                );
-            }
-
-            const message = this.isEdit
-                ? 'Pohod je bil uspešno posodobljen!'
-                : 'Pohod je bil uspešno dodan!';
-            alert(message);
-
-            if (this.isEdit) {
-                window.location.href = `./pohod.html?id=${this.pohodId}`;
-            } else {
-                window.location.href = './profil-drustvo.html';
-            }
-        } catch (error) {
-            console.error(
-                `Error ${this.isEdit ? 'updating' : 'creating'} pohod:`,
-                error
-            );
-            alert(
-                `Napaka pri ${
-                    this.isEdit ? 'posodabljanju' : 'dodajanju'
-                } pohoda. Prosimo, poskusite znova.`
-            );
-        }
-    }
-
-    // Rest of the methods remain the same...
     attachEventListeners() {
         const form = document.getElementById('dodajPohodForm');
         form.addEventListener('submit', this.handleSubmit.bind(this));
+
+        // Add image preview functionality
+        const imageInput = document.getElementById('pohodSlika');
+        const imagePreview = document.getElementById('imagePreview');
+        const imagePreviewContainer = document.getElementById(
+            'imagePreviewContainer'
+        );
+        const clearImageBtn = document.getElementById('clearImageBtn');
+
+        imageInput.addEventListener('change', function () {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    imagePreview.src = e.target.result;
+                    imagePreviewContainer.style.display = 'block';
+                };
+
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+
+        clearImageBtn.addEventListener('click', function () {
+            imageInput.value = '';
+            imagePreviewContainer.style.display = 'none';
+        });
+    }
+
+    async handleSubmit(e) {
+        e.preventDefault();
+
+        const form = e.target;
+        const formData = new FormData(form);
+        const user = Auth.getUser();
+
+        try {
+            const drustvoResponse = await fetch(`/api/drustvo/${user.id}`);
+            const drustvo = await drustvoResponse.json();
+
+            if (!drustvo) {
+                throw new Error('Društvo not found');
+            }
+
+            formData.append(
+                'TK_PohodniskoDrustvo',
+                drustvo.IDPohodniskoDrustvo
+            );
+
+            // API endpoint depends on whether we're editing or creating
+            const url = this.isEdit
+                ? `/api/pohodi/${this.pohodId}`
+                : '/api/pohodi';
+
+            const method = this.isEdit ? 'PUT' : 'POST';
+
+            // For PUT requests, we need special handling for FormData with files
+            const options = {
+                method: method,
+                body: formData,
+                // No Content-Type header - browser will set it with boundary for FormData
+            };
+
+            const response = await fetch(url, options);
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'Something went wrong');
+            }
+
+            const result = await response.json();
+
+            // Redirect to the new/edited pohod
+            const pohodId = this.isEdit ? this.pohodId : result.id;
+            window.location.href = `./pohod.html?id=${pohodId}`;
+        } catch (error) {
+            console.error('Error saving pohod:', error);
+            alert(`Napaka pri shranjevanju pohoda: ${error.message}`);
+        }
     }
 }
 

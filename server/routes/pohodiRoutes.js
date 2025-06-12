@@ -2,6 +2,41 @@ const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
 const Pohod = require('../models/Pohod');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+
+// Configure multer for image uploads
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        const uploadDir = path.join(__dirname, '../../public/images/pohodi');
+        // Create directory if it doesn't exist
+        if (!fs.existsSync(uploadDir)) {
+            fs.mkdirSync(uploadDir, { recursive: true });
+        }
+        cb(null, uploadDir);
+    },
+    filename: function (req, file, cb) {
+        // Will be renamed after pohod is created with its ID
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+        cb(null, 'temp-' + uniqueSuffix + path.extname(file.originalname));
+    },
+});
+
+// File filter to only accept images
+const fileFilter = (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+        cb(null, true);
+    } else {
+        cb(new Error('Only image files are allowed!'), false);
+    }
+};
+
+const upload = multer({
+    storage: storage,
+    limits: { fileSize: 2 * 1024 * 1024 }, // 2MB limit
+    fileFilter: fileFilter,
+});
 
 // Get all pohodi
 router.get('/api/pohodi', async (req, res) => {
@@ -51,26 +86,82 @@ router.get('/api/pohodi/:id', async (req, res) => {
 });
 
 // Create new pohod
-router.post('/api/pohodi', async (req, res) => {
-    try {
-        const id = await Pohod.create(req.body);
-        res.status(201).json({ id });
-    } catch (error) {
-        console.error('Error creating pohod:', error);
-        res.status(500).json({ error: 'Server error' });
-    }
-});
+router.post(
+    '/api/pohodi',
+    auth,
+    upload.single('pohodSlika'),
+    async (req, res) => {
+        try {
+            const pohodData = req.body;
 
-// Update pohod
-router.put('/api/pohodi/:id', async (req, res) => {
-    try {
-        await Pohod.update(req.params.id, req.body);
-        res.json({ success: true });
-    } catch (error) {
-        console.error('Error updating pohod:', error);
-        res.status(500).json({ error: 'Server error' });
+            const id = await Pohod.create(pohodData);
+
+            // If there's an uploaded file, rename it to match the pohod ID
+            if (req.file) {
+                const oldPath = req.file.path;
+                const fileExt = path.extname(req.file.originalname);
+                const newFilename = `${id}${fileExt}`;
+                const newPath = path.join(path.dirname(oldPath), newFilename);
+
+                fs.renameSync(oldPath, newPath);
+
+                // Update pohod with image path
+                await Pohod.update(id, {
+                    SlikanaslovnicaFilename: newFilename,
+                });
+            }
+
+            res.status(201).json({ id });
+        } catch (error) {
+            console.error('Error creating pohod:', error);
+            res.status(500).json({ error: 'Server error' });
+        }
     }
-});
+);
+
+// Update pohod with image
+router.put(
+    '/api/pohodi/:id',
+    auth,
+    upload.single('pohodSlika'),
+    async (req, res) => {
+        try {
+            const pohodId = req.params.id;
+            const pohodData = req.body;
+
+            // If there's an uploaded file, process it
+            if (req.file) {
+                const uploadDir = path.join(
+                    __dirname,
+                    '../../public/images/pohodi'
+                );
+                const fileExt = path.extname(req.file.originalname);
+                const newFilename = `${pohodId}${fileExt}`;
+                const newPath = path.join(uploadDir, newFilename);
+
+                // Remove old image if it exists (with any extension)
+                const dir = fs.readdirSync(uploadDir);
+                dir.forEach((file) => {
+                    if (file.startsWith(pohodId + '.')) {
+                        fs.unlinkSync(path.join(uploadDir, file));
+                    }
+                });
+
+                // Rename uploaded file
+                fs.renameSync(req.file.path, newPath);
+
+                // Add filename to pohod data
+                pohodData.SlikanaslovnicaFilename = newFilename;
+            }
+
+            await Pohod.update(pohodId, pohodData);
+            res.json({ success: true });
+        } catch (error) {
+            console.error('Error updating pohod:', error);
+            res.status(500).json({ error: 'Server error' });
+        }
+    }
+);
 
 router.delete('/api/pohodi/:id', auth, async (req, res) => {
     try {
