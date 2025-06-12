@@ -170,7 +170,7 @@ class Profile {
         const duration = pohod.Trajanje ? pohod.Trajanje.split(':')[0] : '?';
 
         return `
-        <div class="col-md-6 mb-4" 
+        <div class="col-md-6 mb-4 bg-light" 
              data-difficulty="${pohod.Tezavnost}"
              data-location="${pohod.Lokacija}"
              data-date="${date}">

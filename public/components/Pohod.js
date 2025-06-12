@@ -49,13 +49,17 @@ class Pohod {
 
         const buttonHtml = user
             ? user.type === 'drustvo'
-                ? '' // No button for društvo
-                : `<button class="btn btn-primary btn-lg" onclick="prijavaNaPohod(${pohod.IDPohod})">
-                <i class="fas fa-user-plus me-2"></i>Prijavi se na pohod
+                ? user.id === pohod.DrustvoUserId // Check if drustvo owns this pohod
+                    ? `<button class="btn btn-warning btn-lg" onclick="editPohod(${pohod.IDPohod})">
+                <i class="fas fa-edit me-2"></i>Uredi pohod
                </button>`
+                    : '' // No button if drustvo doesn't own this pohod
+                : `<button class="btn btn-primary btn-lg" onclick="prijavaNaPohod(${pohod.IDPohod})">
+            <i class="fas fa-user-plus me-2"></i>Prijavi se na pohod
+           </button>`
             : `<a href="./prijava.html" class="btn btn-primary btn-lg">
-            <i class="fas fa-sign-in-alt me-2"></i>Prijavi se
-           </a>`;
+        <i class="fas fa-sign-in-alt me-2"></i>Prijavi se
+       </a>`;
 
         this.container.innerHTML = `
             <section class="pohod-detail mb-4">
@@ -485,6 +489,10 @@ class Pohod {
             this.map = null;
         }
     }
+}
+
+function editPohod(pohodId) {
+    window.location.href = `./dodaj-pohod.html?edit=${pohodId}`;
 }
 
 // Initialize when DOM is loaded

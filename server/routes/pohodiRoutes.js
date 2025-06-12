@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const auth = require('../middleware/auth');
 const Pohod = require('../models/Pohod');
 
 // Get all pohodi
@@ -71,9 +72,19 @@ router.put('/api/pohodi/:id', async (req, res) => {
     }
 });
 
-// Delete pohod
-router.delete('/api/pohodi/:id', async (req, res) => {
+router.delete('/api/pohodi/:id', auth, async (req, res) => {
     try {
+        // First check if the pohod exists and get its owner
+        const pohod = await Pohod.getById(req.params.id);
+        if (!pohod) {
+            return res.status(404).json({ error: 'Pohod not found' });
+        }
+
+        // Check if the user owns this pohod
+        if (req.user.id !== pohod.DrustvoUserId) {
+            return res.status(403).json({ error: 'Unauthorized' });
+        }
+
         await Pohod.delete(req.params.id);
         res.json({ success: true });
     } catch (error) {

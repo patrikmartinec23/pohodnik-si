@@ -171,6 +171,36 @@ class Pohod {
         }
     }
 
+    static async getByDrustvoWithPagination(drustvoId, page = 1, limit = 2) {
+        try {
+            const offset = (page - 1) * limit;
+
+            // Get total count first (this should remain consistent)
+            const totalResult = await db('Pohod')
+                .where('TK_PohodniskoDrustvo', drustvoId)
+                .count('* as total');
+
+            const total = parseInt(totalResult[0].total);
+
+            // Get paginated pohodi
+            const pohodi = await db('Pohod')
+                .where('TK_PohodniskoDrustvo', drustvoId)
+                .orderBy('DatumPohoda', 'desc')
+                .limit(limit)
+                .offset(offset);
+
+            return {
+                pohodi,
+                total,
+                currentPage: page,
+                hasMore: page * limit < total,
+            };
+        } catch (error) {
+            console.error('Error in getByDrustvoWithPagination:', error);
+            throw error;
+        }
+    }
+
     static async delete(id) {
         try {
             return await db('Pohod').where('IDPohod', id).delete();

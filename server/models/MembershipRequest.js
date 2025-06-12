@@ -23,15 +23,24 @@ class MembershipRequest {
         }
     }
 
-    static async create(drustvoId, pohodnikId) {
+    static async create(drustvoId, userId) {
         try {
-            const [id] = await db('Zahteve_za_vclanitev').insert({
+            // First, find the pohodnik record using the user ID
+            const pohodnik = await db('Pohodnik')
+                .where('TK_Uporabnik', userId)
+                .first();
+
+            if (!pohodnik) {
+                throw new Error('Pohodnik profile not found for this user');
+            }
+
+            // Use the actual IDPohodnik, not the TK_Uporabnik
+            return await db('Zahteve_za_vclanitev').insert({
                 TK_PohodniskoDrustvo: drustvoId,
-                TK_Pohodnik: pohodnikId,
-                DatumZahteve: db.fn.now(),
+                TK_Pohodnik: pohodnik.IDPohodnik, // This should be 7, not 13
+                DatumZahteve: new Date(),
                 Dogajanje: 'V obdelavi',
             });
-            return id;
         } catch (error) {
             console.error('Error in create:', error);
             throw error;
@@ -67,6 +76,68 @@ class MembershipRequest {
         } catch (error) {
             await trx.rollback();
             console.error('Error in handleRequest:', error);
+            throw error;
+        }
+    }
+
+    static async checkMembershipStatus(drustvoId, userId) {
+        try {
+            const pohodnik = await db('Pohodnik')
+                .where('TK_Uporabnik', userId)
+                .first();
+
+            if (!pohodnik) {
+                return { isMember: false, hasPendingRequest: false };
+            }
+
+            // Check if member
+            const membership = await db('Clanarina')
+                .where({
+                    TK_PohodniskoDrustvo: drustvoId,
+                    TK_Pohodnik: pohodnik.IDPohodnik,
+                })
+                .first();
+
+            // Check if has pending request
+            const pendingRequest = await db('Zahteve_za_vclanitev')
+                .where({
+                    TK_PohodniskoDrustvo: drustvoId,
+                    TK_Pohodnik: pohodnik.IDPohodnik,
+                    Dogajanje: 'V obdelavi',
+                })
+                .first();
+
+            return {
+                isMember: !!membership,
+                hasPendingRequest: !!pendingRequest,
+            };
+        } catch (error) {
+            console.error('Error in checkMembershipStatus:', error);
+            throw error;
+        }
+    }
+
+    static async leaveMembership(drustvoId, userId) {
+        try {
+            const pohodnik = await db('Pohodnik')
+                .where('TK_Uporabnik', userId)
+                .first();
+
+            if (!pohodnik) {
+                throw new Error('Pohodnik not found');
+            }
+
+            // Remove from membership
+            await db('Clanarina')
+                .where({
+                    TK_PohodniskoDrustvo: drustvoId,
+                    TK_Pohodnik: pohodnik.IDPohodnik,
+                })
+                .del();
+
+            return true;
+        } catch (error) {
+            console.error('Error in leaveMembership:', error);
             throw error;
         }
     }

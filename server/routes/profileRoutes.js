@@ -3,6 +3,7 @@ const router = express.Router();
 const auth = require('../middleware/auth');
 const Profile = require('../models/Profile');
 const MembershipRequest = require('../models/MembershipRequest');
+const Pohod = require('../models/Pohod');
 
 // Get user profile
 router.get('/api/users/:id', auth, async (req, res) => {
@@ -99,24 +100,12 @@ router.get(
     }
 );
 
-// Submit a membership request
 router.post(
     '/api/drustvo/:drustvoId/request-membership',
     auth,
     async (req, res) => {
         try {
-            const pohodnik = await db('Pohodnik')
-                .where('TK_Uporabnik', req.user.id)
-                .first();
-
-            if (!pohodnik) {
-                return res.status(404).json({ error: 'Pohodnik not found' });
-            }
-
-            await MembershipRequest.create(
-                req.params.drustvoId,
-                pohodnik.IDPohodnik
-            );
+            await MembershipRequest.create(req.params.drustvoId, req.user.id);
             res.status(201).json({ message: 'Request submitted successfully' });
         } catch (error) {
             console.error('Error submitting membership request:', error);
@@ -125,7 +114,6 @@ router.post(
     }
 );
 
-// Handle membership request (accept/reject)
 router.post(
     '/api/membership-requests/:requestId/:action',
     auth,
@@ -144,5 +132,59 @@ router.post(
         }
     }
 );
+
+// Check membership status
+router.get(
+    '/api/drustvo/:drustvoId/membership-status',
+    auth,
+    async (req, res) => {
+        try {
+            const status = await MembershipRequest.checkMembershipStatus(
+                req.params.drustvoId,
+                req.user.id
+            );
+            res.json(status);
+        } catch (error) {
+            console.error('Error checking membership status:', error);
+            res.status(500).json({ error: 'Server error' });
+        }
+    }
+);
+
+// Leave membership
+router.post(
+    '/api/drustvo/:drustvoId/leave-membership',
+    auth,
+    async (req, res) => {
+        try {
+            await MembershipRequest.leaveMembership(
+                req.params.drustvoId,
+                req.user.id
+            );
+            res.json({ message: 'Successfully left membership' });
+        } catch (error) {
+            console.error('Error leaving membership:', error);
+            res.status(500).json({ error: 'Server error' });
+        }
+    }
+);
+
+router.get('/api/drustvo/:drustvoId/pohodi', async (req, res) => {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 2;
+
+        const result = await Pohod.getByDrustvoWithPagination(
+            req.params.drustvoId,
+            page,
+            limit
+        );
+
+        res.json(result);
+    } catch (error) {
+        console.error('Error fetching drustvo pohodi:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
 
 module.exports = router;
