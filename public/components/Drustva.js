@@ -21,8 +21,7 @@ class Drustva {
                 <div class="row mb-4">
                     <div class="col-12">
                         <h2 class="fw-bold">Pohodniška društva</h2>
-                        <p class="text-muted mb-3">Pregled vseh pohodniških društev</p>
-                        <hr class="hr-heading-primary w-25" />
+                        <hr class="hr-heading-primary w-100" />
                     </div>
                 </div>
                 <div class="row">
@@ -43,8 +42,7 @@ class Drustva {
                 <div class="row mb-4">
                     <div class="col-12">
                         <h2 class="fw-bold">Pohodniška društva</h2>
-                        <p class="text-muted mb-3">Pregled vseh pohodniških društev</p>
-                        <hr class="hr-heading-primary w-25" />
+                        <hr class="hr-heading-primary w-100" />
                     </div>
                 </div>
                 <div class="row">
@@ -88,8 +86,7 @@ class Drustva {
                     <div class="col-12 d-flex justify-content-between align-items-start">
                         <div>
                             <h2 class="fw-bold">Pohodniška društva</h2>
-                            <p class="text-muted mb-3">Pregled vseh pohodniških društev</p>
-                            <hr class="hr-heading-primary w-25" />
+                            <hr class="hr-heading-primary w-100" />
                         </div>
                         <div>
                             <div class="input-group">
@@ -117,8 +114,7 @@ class Drustva {
                 <div class="row mb-4">
                     <div class="col-12">
                         <h2 class="fw-bold">Pohodniška društva</h2>
-                        <p class="text-muted mb-3">Pregled vseh pohodniških društev</p>
-                        <hr class="hr-heading-primary w-25" />
+                        <hr class="hr-heading-primary w-100" />
                     </div>
                 </div>
                 <div class="row">
@@ -133,62 +129,62 @@ class Drustva {
     }
 
     createDrustvoCard(drustvo) {
-        // Random background header from a set of mountain images (1-5)
-        const randomBg = Math.floor(Math.random() * 5) + 1;
-        const bgImageUrl = `../images/mountains-${randomBg}.jpg`;
+        // Use the drustvo ID to reference the banner image saved in images/drustva folder
+        const bgImageUrl = `../images/drustva/${drustvo.IDPohodniskoDrustvo}.jpg`;
+        // Default fallback image if the specific one doesn't exist
+        const defaultBgImage = '../images/colton-duke-QRU0i5AqEJA-unsplash.jpg';
 
         return `
-        <div class="col-lg-4 col-md-6 mb-4">
-            <div class="card h-100 shadow-sm border-0 hover-shadow">
-                <div class="card-header p-0 position-relative">
-                    <div class="bg-image" style="
-                        background-image: url('${bgImageUrl}');
-                        height: 140px;
-                        background-size: cover;
-                        background-position: center;
+    <div class="col-lg-4 col-md-6 mb-4">
+        <div class="card h-100 shadow-sm border-0 hover-shadow">
+            <div class="card-header p-0 position-relative">
+                <div class="bg-image" style="
+                    background-image: url('${bgImageUrl}');
+                    height: 140px;
+                    background-size: cover;
+                    background-position: center;
+                " 
+                onerror="this.style.backgroundImage = 'url(${defaultBgImage})'">
+                    <div class="overlay p-3" style="
+                        background: rgba(0,0,0,0.5);
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        right: 0;
+                        bottom: 0;
                     ">
-                        <div class="overlay p-3" style="
-                            background: rgba(0,0,0,0.5);
-                            position: absolute;
-                            top: 0;
-                            left: 0;
-                            right: 0;
-                            bottom: 0;
-                        ">
-                            <h4 class="text-white mb-0 fw-bold">${
-                                drustvo.DrustvoIme
-                            }</h4>
-                            <small class="text-white-50">
-                                <i class="fas fa-calendar me-1"></i>Est. ${
-                                    drustvo.LetoUstanovitve || 'N/A'
-                                }
-                            </small>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <div class="d-flex align-items-center mb-2">
-                            <i class="fas fa-map-marker-alt text-primary me-2"></i>
-                            <span>${drustvo.Naslov || 'Ni podatka'}</span>
-                        </div>
-                        <div class="d-flex align-items-center mb-2">
-                            <i class="fas fa-user text-primary me-2"></i>
-                            <span>${drustvo.Predsednik || 'Ni podatka'}</span>
-                        </div>
-                    </div>
-                    
-                    <div class="text-center mt-4">
-                        <a href="./profil-drustvo.html?id=${
-                            drustvo.TK_Uporabnik
-                        }" 
-                            class="btn btn-primary btn-lg w-100">
-                            <i class="fas fa-info-circle me-2"></i>Oglej si društvo
-                        </a>
+                        <h4 class="text-white mb-0 fw-bold">${
+                            drustvo.DrustvoIme
+                        }</h4>
+                        <small class="text-white-50">
+                            <i class="fas fa-calendar me-1"></i>Est. ${
+                                drustvo.LetoUstanovitve || 'N/A'
+                            }
+                        </small>
                     </div>
                 </div>
             </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-map-marker-alt text-primary me-2"></i>
+                        <span>${drustvo.Naslov || 'Ni podatka'}</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-user text-primary me-2"></i>
+                        <span>${drustvo.Predsednik || 'Ni podatka'}</span>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-4">
+                    <a href="./profil-drustvo.html?id=${drustvo.TK_Uporabnik}" 
+                        class="btn btn-primary btn-lg w-100">
+                        <i class="fas fa-info-circle me-2"></i>Oglej si društvo
+                    </a>
+                </div>
+            </div>
         </div>
+    </div>
     `;
     }
 

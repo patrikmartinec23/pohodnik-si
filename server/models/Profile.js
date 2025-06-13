@@ -272,6 +272,37 @@ class Profile {
             throw error;
         }
     }
+
+    // Add this method to handle drustvo profile updates
+
+    static async updateDrustvoProfile(drustvoId, profileData) {
+        try {
+            // Sanitize input data
+            const updateData = {
+                DrustvoIme: profileData.DrustvoIme,
+                Naslov: profileData.Naslov,
+                Predsednik: profileData.Predsednik,
+                Opis: profileData.Opis,
+            };
+
+            // Remove undefined fields
+            Object.keys(updateData).forEach((key) => {
+                if (updateData[key] === undefined) {
+                    delete updateData[key];
+                }
+            });
+
+            // Update the drustvo record
+            await db('PohodniskoDrustvo')
+                .where('IDPohodniskoDrustvo', drustvoId)
+                .update(updateData);
+
+            return true;
+        } catch (error) {
+            console.error('Error in updateDrustvoProfile:', error);
+            throw error;
+        }
+    }
 }
 
 module.exports = Profile;

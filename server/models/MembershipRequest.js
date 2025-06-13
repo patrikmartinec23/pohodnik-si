@@ -33,6 +33,30 @@ class MembershipRequest {
                 throw new Error('Pohodnik profile not found for this user');
             }
 
+            // Check how many active memberships the user has
+            const membershipCount = await db('Clanarina')
+                .where('TK_Pohodnik', pohodnik.IDPohodnik)
+                .count('* as count')
+                .first();
+
+            // If they're already in 5 societies, prevent joining more
+            if (membershipCount.count >= 5) {
+                throw new Error('limit_reached');
+            }
+
+            // Also check if there's already a pending request
+            const existingRequest = await db('Zahteve_za_vclanitev')
+                .where({
+                    TK_PohodniskoDrustvo: drustvoId,
+                    TK_Pohodnik: pohodnik.IDPohodnik,
+                    Dogajanje: 'V obdelavi',
+                })
+                .first();
+
+            if (existingRequest) {
+                throw new Error('pending_request');
+            }
+
             return await db('Zahteve_za_vclanitev').insert({
                 TK_PohodniskoDrustvo: drustvoId,
                 TK_Pohodnik: pohodnik.IDPohodnik,

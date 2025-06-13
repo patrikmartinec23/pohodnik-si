@@ -77,50 +77,50 @@ class ProfileDrustvo {
         let buttonContent = '';
         if (isOwner) {
             buttonContent = `
-        <a href="./dodaj-pohod.html" class="btn btn-primary w-100 mb-3">
-            <i class="fas fa-plus me-2"></i>Dodaj nov pohod
-        </a>
-    `;
-        } else {
-            // Only show membership buttons for pohodniki
-            if (user && user.type === 'pohodnik') {
-                if (membershipStatus?.isMember) {
-                    buttonContent = `
-                    <button onclick="profileDrustvo.leaveMembership(${drustvo.IDPohodniskoDrustvo})" 
-                            class="btn btn-danger w-100">
-                        <i class="fas fa-user-minus me-2"></i>Izpiši se iz društva
-                    </button>
-                `;
-                } else if (membershipStatus?.hasPendingRequest) {
-                    buttonContent = `
-                    <button class="btn btn-secondary w-100" disabled>
-                        <i class="fas fa-clock me-2"></i>Zahteva v obdelavi
-                    </button>
-                `;
-                } else {
-                    buttonContent = `
-                    <button onclick="profileDrustvo.requestMembership(${drustvo.IDPohodniskoDrustvo})" 
-                            class="btn btn-primary w-100">
-                        <i class="fas fa-user-plus me-2"></i>Včlani se v društvo
-                    </button>
-                `;
-                }
-            } else if (user && user.type === 'drustvo') {
-                // No button for other društva
-                buttonContent = '';
-            } else {
-                // Not logged in - show login button
-                buttonContent = `
-            <a href="./prijava.html" class="btn btn-primary w-100">
-                <i class="fas fa-sign-in-alt me-2"></i>Prijavi se
-            </a>
+            <div class="d-grid gap-2 mt-3">
+                <a href="./dodaj-pohod.html" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Dodaj nov pohod
+                </a>
+                <a href="./edit-drustvo.html" class="btn btn-outline-primary mt-2">
+                    <i class="fas fa-edit me-2"></i>Uredi profil društva
+                </a>
+            </div>
         `;
-            }
+        } else if (!user) {
+            buttonContent = `
+            <div class="alert alert-info mt-3" role="alert">
+                <i class="fas fa-info-circle me-2"></i>Za včlanitev se morate prijaviti.
+            </div>
+        `;
+        } else if (membershipStatus?.isMember) {
+            buttonContent = `
+            <div class="d-grid gap-2 mt-3">
+                <button class="btn btn-outline-danger" onclick="profileDrustvo.leaveMembership('${drustvo.IDPohodniskoDrustvo}')">
+                    <i class="fas fa-sign-out-alt me-2"></i>Izpiši se iz društva
+                </button>
+            </div>
+        `;
+        } else if (membershipStatus?.hasPendingRequest) {
+            buttonContent = `
+            <div class="alert alert-warning mt-3" role="alert">
+                <i class="fas fa-clock me-2"></i>Vaša zahteva je v obdelavi.
+            </div>
+        `;
+        } else {
+            buttonContent = `
+            <div class="d-grid gap-2 mt-3">
+                <button class="btn btn-success" onclick="profileDrustvo.requestMembership('${drustvo.IDPohodniskoDrustvo}')">
+                    <i class="fas fa-user-plus me-2"></i>Včlani se
+                </button>
+            </div>
+        `;
         }
 
         this.container.innerHTML = `
         <div class="profile-banner" style="
-            background-image: url('../images/colton-duke-QRU0i5AqEJA-unsplash.jpg');
+            background-image: url('../images/drustva/${
+                drustvo.IDPohodniskoDrustvo
+            }.jpg');
             height: 300px;
             background-size: cover;
             background-position: center;
@@ -175,6 +175,18 @@ class ProfileDrustvo {
                                     }
                                 </li>
                             </ul>
+                            
+                            ${
+                                drustvo.Opis
+                                    ? `
+                            <div class="mt-4">
+                                <h5 class="mb-2">Opis društva</h5>
+                                <p class="text-muted">${drustvo.Opis}</p>
+                            </div>
+                            `
+                                    : ''
+                            }
+                            
                             ${buttonContent}
                         </div>
                     </div>
@@ -221,18 +233,7 @@ class ProfileDrustvo {
                         </div>
                     </div>
 
-                    <!-- Rating Section (for members only) - MOVED HERE -->
-                    ${
-                        user && user.type === 'pohodnik' && !isOwner
-                            ? `
-                        <div class="card shadow-sm bg-light mb-4" id="ratingSection">
-                            <!-- Rating form/display will be loaded here -->
-                        </div>
-                    `
-                            : ''
-                    }
-
-                    <!-- Ratings Display - MOVED HERE -->
+                    <!-- Ratings Display -->
                     <div class="card shadow-sm bg-light mb-4">
                         <div class="card-body">
                             <h5 class="card-title mb-4">
@@ -243,10 +244,32 @@ class ProfileDrustvo {
                             </div>
                         </div>
                     </div>
+                    
+                    <!-- Rating Section (for members only) -->
+                    ${
+                        user && user.type === 'pohodnik' && !isOwner
+                            ? `
+                        <div class="card shadow-sm bg-light mb-4" id="ratingSection">
+                            <!-- Rating form/display will be loaded here -->
+                        </div>
+                    `
+                            : ''
+                    }
                 </div>
             </div>
         </div>
     `;
+
+        // Add image onerror handler to use default if custom image doesn't exist
+        const bannerEl = document.querySelector('.profile-banner');
+        if (bannerEl) {
+            const banner = new Image();
+            banner.onload = () => {}; // Image exists, do nothing
+            banner.onerror = () => {
+                bannerEl.style.backgroundImage = `url('../images/colton-duke-QRU0i5AqEJA-unsplash.jpg')`;
+            };
+            banner.src = `../images/drustva/${drustvo.IDPohodniskoDrustvo}.jpg`;
+        }
 
         // Load average rating
         this.loadAverageRating(drustvo.IDPohodniskoDrustvo);
@@ -259,8 +282,6 @@ class ProfileDrustvo {
             this.loadRatingSection(drustvo.IDPohodniskoDrustvo);
         }
     }
-
-    // Add these new methods:
 
     async loadAverageRating(drustvoId) {
         try {
@@ -724,23 +745,6 @@ class ProfileDrustvo {
         }
 
         try {
-            // Check if already requested
-            const checkResponse = await fetch(
-                `/api/drustvo/${drustvoId}/membership-status`
-            );
-            const { isMember, hasPendingRequest } = await checkResponse.json();
-
-            if (isMember) {
-                alert('Že ste član tega društva');
-                return;
-            }
-
-            if (hasPendingRequest) {
-                alert('Vaša zahteva za včlanitev je že v obdelavi');
-                return;
-            }
-
-            // Submit request
             const response = await fetch(
                 `/api/drustvo/${drustvoId}/request-membership`,
                 {
@@ -751,15 +755,26 @@ class ProfileDrustvo {
                 }
             );
 
-            if (!response.ok) throw new Error('Failed to submit request');
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(
+                    errorData.error || 'Napaka pri zahtevi za včlanitev'
+                );
+            }
 
             alert('Zahteva za včlanitev je bila uspešno poslana');
-
-            // Refresh the profile data instead of reloading the page
-            await this.init();
+            window.location.reload();
         } catch (error) {
             console.error('Error requesting membership:', error);
-            alert('Napaka pri pošiljanju zahteve');
+
+            // Check for the specific limit reached error
+            if (error.message === 'Dosežena je omejitev članstva') {
+                alert(
+                    'Ne morete se včlaniti v več kot 5 društev hkrati. Najprej se izpišite iz katerega od obstoječih društev.'
+                );
+            } else {
+                alert(`Napaka: ${error.message}`);
+            }
         }
     }
 
@@ -783,13 +798,17 @@ class ProfileDrustvo {
                 : pohod.ZbirnoMesto || 'N/A';
         const duration = pohod.Trajanje ? pohod.Trajanje.split(':')[0] : '?';
 
+        const imageUrl = pohod.SlikanaslovnicaFilename
+            ? `../images/pohodi/${pohod.SlikanaslovnicaFilename}`
+            : '../images/default-pohod.jpg';
+
         return `
     <div class="col-md-6 mb-4">
         <div class="card pohod-card hover-shadow h-100">
             <a href="pohod.html?id=${
                 pohod.IDPohod
             }" class="text-decoration-none">
-                <img src="../images/project-1.jpg" 
+                <img src="${imageUrl}" 
                      alt="${pohod.PohodIme}" 
                      class="card-img-top" 
                      style="height: 200px; object-fit: cover;"
@@ -1007,13 +1026,19 @@ class ProfileDrustvo {
                 : pohod.Lokacija || 'N/A';
         const duration = pohod.Trajanje ? pohod.Trajanje.split(':')[0] : '?';
 
+        // Use the correct image path: images/pohodi/IDPohoda.jpg
+        const imageUrl = pohod.SlikanaslovnicaFilename
+            ? `../images/pohodi/${pohod.SlikanaslovnicaFilename}`
+            : '../images/default-pohod.jpg';
+
         return `
         <div class="col-md-6 mb-4">
             <div class="card pohod-card hover-shadow">
                 <a href="pohod.html?id=${pohod.IDPohod}" class="text-decoration-none">
-                    <img src="../images/project-1.jpg" 
+                    <img src="${imageUrl}" 
                          alt="${pohod.PohodIme}" 
                          class="card-img-top" 
+                         style="height: 180px; object-fit: cover;"
                          onerror="this.src='../images/default-pohod.jpg'" />
                     <div class="card-body text-dark">
                         <div class="d-flex justify-content-between align-items-start mb-2">
@@ -1104,26 +1129,41 @@ class ProfileDrustvo {
         }
 
         try {
+            // Show loading state
+            const buttons = document.querySelectorAll(
+                `button[onclick*="${pohodId}"]`
+            );
+            buttons.forEach((button) => {
+                button.disabled = true;
+                button.innerHTML =
+                    '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Brisanje...';
+            });
+
             const response = await fetch(`/api/pohodi/${pohodId}`, {
                 method: 'DELETE',
             });
 
-            if (!response.ok) throw new Error('Failed to delete pohod');
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'Napaka pri brisanju pohoda');
+            }
 
-            alert('Pohod je bil uspešno izbrisan');
-
-            // Reset pagination and reload both sections
-            this.upcomingPage = 1;
-            this.pastPage = 1;
-            this.upcomingHasMore = true;
-            this.pastHasMore = true;
-
-            const drustvoId = this.currentDrustvoId;
-            await this.loadUpcomingPohodi(drustvoId);
-            await this.loadPastPohodi(drustvoId);
+            // Success
+            alert('Pohod je bil uspešno izbrisan.');
+            // Reload the page to update the UI
+            window.location.reload();
         } catch (error) {
             console.error('Error deleting pohod:', error);
-            alert('Napaka pri brisanju pohoda');
+            alert(`Napaka pri brisanju pohoda: ${error.message}`);
+
+            // Restore button state on error
+            const buttons = document.querySelectorAll(
+                `button[onclick*="${pohodId}"]`
+            );
+            buttons.forEach((button) => {
+                button.disabled = false;
+                button.innerHTML = '<i class="fas fa-trash me-1"></i>';
+            });
         }
     }
 }

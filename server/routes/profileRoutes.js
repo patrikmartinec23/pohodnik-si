@@ -5,6 +5,39 @@ const Profile = require('../models/Profile');
 const MembershipRequest = require('../models/MembershipRequest');
 const Pohod = require('../models/Pohod');
 const DrustvoRating = require('../models/DrustvoRating');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+
+// Configure multer for drustvo banner uploads
+const bannerStorage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        const uploadDir = path.join(__dirname, '../../public/images/drustva');
+        // Create directory if it doesn't exist
+        if (!fs.existsSync(uploadDir)) {
+            fs.mkdirSync(uploadDir, { recursive: true });
+        }
+        cb(null, uploadDir);
+    },
+    filename: function (req, file, cb) {
+        // Use the drustvo ID as the filename
+        const drustvoId = req.body.IDPohodniskoDrustvo;
+        const fileExt = path.extname(file.originalname);
+        cb(null, `${drustvoId}${fileExt}`);
+    },
+});
+
+const bannerUpload = multer({
+    storage: bannerStorage,
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+    fileFilter: (req, file, cb) => {
+        if (file.mimetype.startsWith('image/')) {
+            cb(null, true);
+        } else {
+            cb(new Error('Only image files are allowed!'), false);
+        }
+    },
+});
 
 // Get user profile
 router.get('/api/users/:id', auth, async (req, res) => {
@@ -110,6 +143,23 @@ router.post(
             res.status(201).json({ message: 'Request submitted successfully' });
         } catch (error) {
             console.error('Error submitting membership request:', error);
+
+            if (error.message === 'limit_reached') {
+                return res.status(400).json({
+                    error: 'Dosežena je omejitev članstva',
+                    details:
+                        'Že ste včlanjeni v 5 društev, kar je največje dovoljeno število članstev.',
+                });
+            }
+
+            if (error.message === 'pending_request') {
+                return res.status(400).json({
+                    error: 'Zahteva že obstaja',
+                    details:
+                        'Že imate aktivno zahtevo za včlanitev v to društvo.',
+                });
+            }
+
             res.status(500).json({ error: 'Server error' });
         }
     }
@@ -299,6 +349,34 @@ router.get('/api/drustvo/:drustvoId/can-rate', auth, async (req, res) => {
     }
 });
 
+// Add this route to handle drustvo profile updates
+
+router.put('/api/drustvo/:userId', auth, async (req, res) => {
+    try {
+        // Check if the authenticated user owns this profile
+        if (req.user.id !== parseInt(req.params.userId)) {
+            return res.status(403).json({ error: 'Unauthorized' });
+        }
+
+        // Get the drustvo profile to find its ID
+        const drustvo = await Profile.getDrustvoProfile(req.params.userId);
+        if (!drustvo) {
+            return res.status(404).json({ error: 'Društvo not found' });
+        }
+
+        // Update the drustvo profile
+        await Profile.updateDrustvoProfile(
+            drustvo.IDPohodniskoDrustvo,
+            req.body
+        );
+
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error updating drustvo profile:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
 router.get('/api/users/:id/memberships', auth, async (req, res) => {
     try {
         const memberships = await Profile.getUserMemberships(req.params.id);
@@ -322,5 +400,88 @@ router.get('/api/users/:id/past-hikes', auth, async (req, res) => {
         res.status(500).json({ error: 'Server error' });
     }
 });
+
+// Update the image upload handler in the combined form+image update route
+router.post(
+    '/api/drustvo/:userId/update',
+    auth,
+    bannerUpload.single('bannerImage'),
+    async (req, res) => {
+        try {
+            // Check if the authenticated user owns this profile
+            if (req.user.id !== parseInt(req.params.userId)) {
+                return res.status(403).json({ error: 'Unauthorized' });
+            }
+
+            // Get the drustvo profile
+            const drustvo = await Profile.getDrustvoProfile(req.params.userId);
+            if (!drustvo) {
+                return res.status(404).json({ error: 'Društvo not found' });
+            }
+
+            // If an image was uploaded, rename it to use IDPohodniskoDrustvo instead of TK_Uporabnik
+            if (req.file) {
+                // Get the uploaded file path and extension
+                const uploadDir = path.join(
+                    __dirname,
+                    '../../public/images/drustva'
+                );
+                const tempPath = req.file.path;
+                const fileExt = path.extname(req.file.originalname);
+
+                // Create the new filename using drustvo.IDPohodniskoDrustvo
+                const newFilename = `${drustvo.IDPohodniskoDrustvo}${fileExt}`;
+                const newPath = path.join(uploadDir, newFilename);
+
+                console.log('Renaming file:', {
+                    from: tempPath,
+                    to: newPath,
+                    drustvoId: drustvo.IDPohodniskoDrustvo,
+                });
+
+                // Delete existing files with the same ID
+                const files = fs.readdirSync(uploadDir);
+                files.forEach((file) => {
+                    if (file.startsWith(`${drustvo.IDPohodniskoDrustvo}.`)) {
+                        const oldPath = path.join(uploadDir, file);
+                        try {
+                            fs.unlinkSync(oldPath);
+                            console.log('Deleted old file:', oldPath);
+                        } catch (err) {
+                            console.error('Error deleting old file:', err);
+                        }
+                    }
+                });
+
+                // Move the uploaded file to the correct path with IDPohodniskoDrustvo as name
+                fs.renameSync(tempPath, newPath);
+                console.log('File renamed successfully to:', newPath);
+            }
+
+            // Update the drustvo profile with the form data
+            const updateData = {
+                DrustvoIme: req.body.DrustvoIme,
+                Naslov: req.body.Naslov,
+                Predsednik: req.body.Predsednik,
+                Opis: req.body.Opis || null,
+            };
+
+            await Profile.updateDrustvoProfile(
+                drustvo.IDPohodniskoDrustvo,
+                updateData
+            );
+
+            // Return success response
+            res.json({
+                success: true,
+                message: 'Društvo profile updated successfully',
+                hasImage: !!req.file,
+            });
+        } catch (error) {
+            console.error('Error updating drustvo profile:', error);
+            res.status(500).json({ error: 'Server error' });
+        }
+    }
+);
 
 module.exports = router;

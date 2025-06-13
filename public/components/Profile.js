@@ -294,7 +294,7 @@ class Profile {
                 : pohod.Lokacija || 'N/A';
         const duration = pohod.Trajanje ? pohod.Trajanje.split(':')[0] : '?';
 
-        // Add this line for image handling
+        // Use the correct image path: images/pohodi/IDPohoda.jpg
         const imageUrl = pohod.SlikanaslovnicaFilename
             ? `../images/pohodi/${pohod.SlikanaslovnicaFilename}`
             : '../images/default-pohod.jpg';
@@ -405,7 +405,7 @@ class Profile {
                 : pohod.ZbirnoMesto || 'N/A';
         const duration = pohod.Trajanje ? pohod.Trajanje.split(':')[0] : '?';
 
-        // Add this line for image handling
+        // Use the correct image path: images/pohodi/IDPohoda.jpg
         const imageUrl = pohod.SlikanaslovnicaFilename
             ? `../images/pohodi/${pohod.SlikanaslovnicaFilename}`
             : '../images/default-pohod.jpg';
@@ -422,6 +422,7 @@ class Profile {
                     <img src="${imageUrl}" 
                          alt="${pohod.PohodIme}" 
                          class="card-img-top" 
+                         style="height: 200px; object-fit: cover;"
                          onerror="this.src='../images/default-pohod.jpg'" />
                     <div class="card-body text-dark">
                         <div class="d-flex justify-content-between align-items-start mb-2">

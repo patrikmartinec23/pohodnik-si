@@ -182,10 +182,30 @@ class Pohod {
         }
     }
 
+    // In server/models/Pohod.js
     static async delete(id) {
+        const trx = await db.transaction();
         try {
-            return await db('Pohod').where('IDPohod', id).delete();
+            // First check if there are any registrations for this pohod
+            const registrations = await trx('Prijava')
+                .where('TK_Pohod', id)
+                .select('*');
+
+            // If there are registrations, delete them first
+            if (registrations.length > 0) {
+                await trx('Prijava').where('TK_Pohod', id).delete();
+            }
+
+            // Also check for comments and delete them
+            await trx('Komentar').where('TK_Pohod', id).delete();
+
+            // Finally delete the pohod itself
+            await trx('Pohod').where('IDPohod', id).delete();
+
+            await trx.commit();
+            return true;
         } catch (error) {
+            await trx.rollback();
             console.error('Error in delete:', error);
             throw error;
         }
