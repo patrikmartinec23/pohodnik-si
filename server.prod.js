@@ -1,9 +1,14 @@
+require('dotenv').config({ path: process.env.NODE_ENV === 'production' ? '.env.render' : '.env' });
+
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const cors = require('cors'); // Add CORS package
 const isProduction = process.env.NODE_ENV === 'production';
+
+console.log('Starting server with environment:', process.env.NODE_ENV);
+console.log('Loading environment variables from:', process.env.NODE_ENV === 'production' ? '.env.render' : '.env');
 
 // Import database - conditionally based on environment
 const povezava = isProduction
