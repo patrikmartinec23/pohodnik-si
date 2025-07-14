@@ -65,7 +65,7 @@ class Drustva {
 
     async loadDrustva() {
         try {
-            const response = await fetch('/api/drustva');
+            const response = await fetch('https://pohodnik-backend.onrender.com/api/drustva');
             const drustva = await response.json();
             this.renderDrustva(drustva);
         } catch (error) {

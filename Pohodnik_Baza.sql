@@ -216,51 +216,6 @@ VALUES
 ('pd_idrija', 'test'),
 ('pd_kamnik', 'test');
 
-INSERT INTO Pohodnik (Ime, Priimek, DatumRojstva, Prebivalisce, TK_Uporabnik)
-VALUES 
-('Petra', 'Novak', '1987-04-20', 'Cankarjeva ulica 8, 1000 Ljubljana', 1),
-('Janez', 'Kranjc', '1993-12-05', 'Slovenska cesta 45, 2000 Maribor', 2),
-('Mojca', 'Zupan', '1989-08-17', 'Kidričeva ulica 12, 3000 Celje', 3),
-('David', 'Oblak', '1986-02-28', 'Prešernova cesta 22, 4000 Kranj', 4),
-('Sara', 'Horvat', '1994-10-14', 'Trubarjeva cesta 7, 8000 Novo Mesto', 5),
-('Miha', 'Petek', '1991-06-03', 'Koprska ulica 18, 6000 Koper', 6),
-('Katja', 'Rozman', '1984-01-25', 'Ptujska cesta 34, 2250 Ptuj', 7),
-('Tomaž', 'Bizjak', '1996-09-08', 'Erjavčeva ulica 19, 5000 Nova Gorica', 8),
-('Anja', 'Kralj', '1983-11-30', 'Murska cesta 25, 9000 Murska Sobota', 9),
-('Rok', 'Jerala', '1990-07-22', 'Postojnska cesta 16, 6230 Postojna', 10),
-('Maja', 'Sošič', '1988-03-11', 'Cesta svobode 41, 4260 Bled', 11),
-('Gregor', 'Maček', '1985-05-07', 'Ribčev Laz 42, 4265 Bohinj', 12),
-('Eva', 'Planinšek', '1992-12-19', 'Tolminska cesta 8, 5220 Tolmin', 13),
-('Luka', 'Vidmar', '1987-08-26', 'Idrijska ulica 15, 5280 Idrija', 14),
-('Simona', 'Kolar', '1993-04-02', 'Kamniška cesta 28, 1241 Kamnik', 15),
-('Matej', 'Potočnik', '1986-10-15', 'Gregorčičeva ulica 11, 1000 Ljubljana', 16),
-('Tadeja', 'Golob', '1991-01-09', 'Lackova cesta 19, 2000 Maribor', 17),
-('Urban', 'Černe', '1989-06-18', 'Savinjska cesta 31, 3000 Celje', 18),
-('Nika', 'Breznik', '1995-02-24', 'Bleiweisova cesta 13, 4000 Kranj', 19),
-('Jure', 'Kamnik', '1984-09-12', 'Glavni trg 5, 8000 Novo Mesto', 20);
-
-
--- More pohodniška društva
-INSERT INTO PohodniskoDrustvo (DrustvoIme, Naslov, LetoUstanovitve, Predsednik, TK_Uporabnik)
-VALUES
-('Pohodno društvo Koper', 'Pristaniška ulica 14, 6000 Koper', 1985, 'Miha Petek', 21),
-('Pohodno društvo Ptuj', 'Slovenski trg 8, 2250 Ptuj', 1992, 'Katja Rozman', 22),
-('Pohodno društvo Nova Gorica', 'Beverinova ulica 3, 5000 Nova Gorica', 1987, 'Tomaž Bizjak', 23),
-('Pohodno društvo Murska Sobota', 'Slovenska ulica 40, 9000 Murska Sobota', 1995, 'Anja Kralj', 24),
-('Pohodno društvo Postojna', 'Jamska cesta 22, 6230 Postojna', 1980, 'Rok Jerala', 25),
-('Pohodno društvo Bled', 'Cesta svobode 15, 4260 Bled', 1975, 'Maja Sošič', 26),
-('Pohodno društvo Bohinj', 'Ribčev Laz 50, 4265 Bohinj', 1970, 'Gregor Maček', 27),
-('Pohodno društvo Tolmin', 'Ulica padlih borcev 12, 5220 Tolmin', 1983, 'Eva Planinšek', 28),
-('Pohodno društvo Idrija', 'Mestni trg 2, 5280 Idrija', 1988, 'Luka Vidmar', 29),
-('Pohodno društvo Kamnik', 'Glavni trg 24, 1241 Kamnik', 1979, 'Simona Kolar', 30);
-
-INSERT INTO Clanarina (TK_PohodniskoDrustvo, TK_Pohodnik)
-VALUES 
-(1, 2), (1, 3), (1, 4), (1, 5),
-(2, 6), (2, 7), (2, 8), (2, 9),
-(3, 10), (3, 11), (3, 12), (3, 13),
-(4, 14), (4, 15), (4, 16), (4, 17),
-(5, 18), (5, 19), (5, 20), (5, 1);
 
 INSERT INTO Pohod(PohodIme, Lokacija, DatumPohoda, TK_PohodniskoDrustvo, ZbirnoMesto, PohodOpis, Tezavnost, Trajanje, ObveznaOprema, PricakovaneRazmere, Prevoz, StroskiPrevoza, ProstaMesta, Vodic, VodicKontakt)
 VALUES

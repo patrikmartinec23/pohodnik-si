@@ -7,6 +7,7 @@ const authRoutes = require('./server/routes/authRoutes');
 const pohodiRoutes = require('./server/routes/pohodiRoutes.js');
 const drustvaRoutes = require('./server/routes/drustvaRoutes');
 const profileRoutes = require('./server/routes/profileRoutes');
+const statsRoutes = require('./server/routes/statsRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -23,6 +24,7 @@ app.use(authRoutes);
 app.use(pohodiRoutes);
 app.use(drustvaRoutes);
 app.use(profileRoutes);
+app.use(statsRoutes);
 
 // Start server
 app.listen(PORT, () => {

@@ -1,0 +1,26 @@
+IDPohodnik,Ime,Priimek,DatumRojstva,Prebivalisce,TK_Uporabnik
+1,Petra,Novak,Mon Apr 20 1987 00:00:00 GMT+0200 (Central European Summer Time),"Cankarjeva ulica 8, 1000 Ljubljana",1
+2,Janez,Kranjc,Sun Dec 05 1993 00:00:00 GMT+0100 (Central European Standard Time),"Slovenska cesta 45, 2000 Maribor",2
+3,Mojca,Zupan,Thu Aug 17 1989 00:00:00 GMT+0200 (Central European Summer Time),"Kidričeva ulica 12, 3000 Celje",3
+4,David,Oblak,Fri Feb 28 1986 00:00:00 GMT+0100 (Central European Standard Time),"Prešernova cesta 22, 4000 Kranj",4
+5,Sara,Horvat,Fri Oct 14 1994 00:00:00 GMT+0100 (Central European Standard Time),"Trubarjeva cesta 7, 8000 Novo Mesto",5
+6,Miha,Petek,Mon Jun 03 1991 00:00:00 GMT+0200 (Central European Summer Time),"Koprska ulica 18, 6000 Koper",6
+7,Katja,Rozman,Wed Jan 25 1984 00:00:00 GMT+0100 (Central European Standard Time),"Ptujska cesta 34, 2250 Ptuj",7
+8,Tomaž,Bizjak,Sun Sep 08 1996 00:00:00 GMT+0200 (Central European Summer Time),"Erjavčeva ulica 19, 5000 Nova Gorica",8
+9,Anja,Kralj,Wed Nov 30 1983 00:00:00 GMT+0100 (Central European Standard Time),"Murska cesta 25, 9000 Murska Sobota",9
+10,Rok,Jerala,Sun Jul 22 1990 00:00:00 GMT+0200 (Central European Summer Time),"Postojnska cesta 16, 6230 Postojna",10
+11,Maja,Sošič,Fri Mar 11 1988 00:00:00 GMT+0100 (Central European Standard Time),"Cesta svobode 41, 4260 Bled",11
+12,Gregor,Maček,Tue May 07 1985 00:00:00 GMT+0200 (Central European Summer Time),"Ribčev Laz 42, 4265 Bohinj",12
+13,Eva,Planinšek,Sat Dec 19 1992 00:00:00 GMT+0100 (Central European Standard Time),"Tolminska cesta 8, 5220 Tolmin",13
+14,Luka,Vidmar,Wed Aug 26 1987 00:00:00 GMT+0200 (Central European Summer Time),"Idrijska ulica 15, 5280 Idrija",14
+15,Simona,Kolar,Fri Apr 02 1993 00:00:00 GMT+0200 (Central European Summer Time),"Kamniška cesta 28, 1241 Kamnik",15
+16,Matej,Potočnik,Wed Oct 15 1986 00:00:00 GMT+0100 (Central European Standard Time),"Gregorčičeva ulica 11, 1000 Ljubljana",16
+17,Tadeja,Golob,Wed Jan 09 1991 00:00:00 GMT+0100 (Central European Standard Time),"Lackova cesta 19, 2000 Maribor",17
+18,Urban,Černe,Sun Jun 18 1989 00:00:00 GMT+0200 (Central European Summer Time),"Savinjska cesta 31, 3000 Celje",18
+19,Nika,Breznik,Fri Feb 24 1995 00:00:00 GMT+0100 (Central European Standard Time),"Bleiweisova cesta 13, 4000 Kranj",19
+20,Jure,Kamnik,Wed Sep 12 1984 00:00:00 GMT+0200 (Central European Summer Time),"Glavni trg 5, 8000 Novo Mesto",20
+21,Patrik,Martinec,Sat Feb 28 2004 00:00:00 GMT+0100 (Central European Standard Time),Maribor,32
+22,,,Thu Nov 30 1899 00:00:00 GMT+0100 (Central European Standard Time),,33
+23,test,test,Sun May 28 2000 00:00:00 GMT+0200 (Central European Summer Time),Maribor,34
+24,Janez,Novak,Sun May 28 2000 00:00:00 GMT+0200 (Central European Summer Time),Maribor,35
+25,JOhn,Doe,Fri Jun 13 2025 00:00:00 GMT+0200 (Central European Summer Time),Maribor,37

@@ -135,3 +135,55 @@ function scrollToTop() {
 }
 
 document.querySelector('#to-top').addEventListener('click', scrollToTop);
+
+// Animated counter function
+function animateCounter(counter, target) {
+    let current = 0;
+    // Animation duration: 1000ms for small numbers, up to 4000ms for large numbers
+    const duration = Math.min(4000, Math.max(1000, target * 50));
+    const steps = Math.min(target, 20); // never more than 20 steps
+    const stepValue = Math.ceil(target / steps);
+    const stepTime = Math.floor(duration / steps);
+
+    function update() {
+        current += stepValue;
+        if (current >= target) {
+            counter.innerText = target;
+        } else {
+            counter.innerText = current;
+            setTimeout(update, stepTime);
+        }
+    }
+    update();
+}
+
+// Fetch stats from the server and update the counters with animation
+async function loadStats() {
+    try {
+        const res = await fetch('https://pohodnik-backend.onrender.com/api/stats');
+        if (!res.ok) throw new Error('Napaka pri pridobivanju statistike');
+        const stats = await res.json();
+
+        // Find all h2 elements in the stats section and update them
+        const statEls = document.querySelectorAll('.col-md-4 h2');
+        statEls.forEach((el) => {
+            const label =
+                el.nextElementSibling?.textContent?.toLowerCase() || '';
+            let value = 0;
+            if (label.includes('uporabnikov')) {
+                value = stats.users;
+            } else if (label.includes('pohodov')) {
+                value = stats.pohodi;
+            } else if (label.includes('društev') || label.includes('drustev')) {
+                value = stats.drustva;
+            }
+            el.setAttribute('data-target', value);
+            el.innerText = '0';
+            animateCounter(el, value);
+        });
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', loadStats);

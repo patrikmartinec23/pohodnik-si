@@ -1,7 +1,7 @@
 class Auth {
     static async login(username, password) {
         try {
-            const response = await fetch('/api/login', {
+            const response = await fetch('https://pohodnik-backend.onrender.com/api/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -44,7 +44,7 @@ class Auth {
 
     static async register(userData) {
         try {
-            const response = await fetch('/api/register', {
+            const response = await fetch('https://pohodnik-backend.onrender.com/api/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -84,7 +84,7 @@ class Auth {
 
     static async refreshUserData() {
         try {
-            const response = await fetch('/api/me'); // You'll need to create this endpoint
+            const response = await fetch('https://pohodnik-backend.onrender.com/api/me'); // You'll need to create this endpoint
             if (response.ok) {
                 const userData = await response.json();
                 localStorage.setItem('user', JSON.stringify(userData));
@@ -98,7 +98,7 @@ class Auth {
 
     static logout() {
         localStorage.removeItem('user');
-        fetch('/api/logout', { method: 'POST' })
+        fetch('https://pohodnik-backend.onrender.com/api/logout', { method: 'POST' })
             .then(() => (window.location.href = '/pages/prijava.html'))
             .catch(console.error);
     }

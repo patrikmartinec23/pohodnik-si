@@ -84,7 +84,7 @@ class Pohodi {
         }
 
         return `
-        <div class="col-md-4 mb-4" 
+        <div class="col-12 col-md-6 col-lg-4 mb-4" 
              data-difficulty="${pohod.Tezavnost}"
              data-location="${pohod.Lokacija}"
              data-date="${date}">
