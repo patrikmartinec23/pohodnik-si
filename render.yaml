@@ -1,0 +1,30 @@
+{
+    'name': 'pohodnik-backend',
+    'env': { 'NODE_ENV': 'production' },
+    'buildCommand': 'npm install',
+    'startCommand': 'npm start',
+    'healthCheckPath': '/api/health',
+    'autoDeploy': true,
+    'plan': 'free',
+    'region': 'frankfurt',
+    'envVars':
+        [
+            { 'key': 'PORT', 'value': '10000' },
+            {
+                'key': 'SUPABASE_URL',
+                'fromDatabase':
+                    { 'name': 'SUPABASE_URL', 'property': 'connectionString' },
+            },
+            { 'key': 'SUPABASE_KEY', 'sync': false },
+            { 'key': 'DB_HOST', 'sync': false },
+            { 'key': 'DB_PORT', 'value': '5432' },
+            { 'key': 'DB_USER', 'sync': false },
+            { 'key': 'DB_PASSWORD', 'sync': false },
+            { 'key': 'DB_NAME', 'value': 'postgres' },
+            { 'key': 'JWT_SECRET', 'generateValue': true },
+            {
+                'key': 'FRONTEND_URL',
+                'value': 'https://your-vercel-app.vercel.app',
+            },
+        ],
+}
