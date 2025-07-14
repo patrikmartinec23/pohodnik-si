@@ -1,12 +1,14 @@
 {
-  "name": "praktikum_moji_izdelki",
+  "name": "pohodnik-backend",
   "version": "1.0.0",
-  "main": "db.js",
+  "main": "server.prod.js",
   "scripts": {
-    "start": "concurrently \"npm run server\" \"npm run sass:watch\"",
+    "start": "node server.prod.js",
+    "dev": "concurrently \"npm run server\" \"npm run sass:watch\"",
     "server": "node server.js",
     "sass:watch": "sass --no-source-map --watch public/scss:public/css",
-    "sass:build": "sass --no-source-map public/scss:public/css"
+    "sass:build": "sass --no-source-map public/scss:public/css",
+    "build": "npm run sass:build"
   },
   "keywords": [],
   "author": "",

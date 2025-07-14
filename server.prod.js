@@ -19,6 +19,15 @@ const statsRoutes = require('./server/routes/statsRoutes');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Configure CORS for production
+const corsOptions = {
+    origin: ['https://pohodnik.si', 'https://www.pohodnik.si'],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+};
+app.use(cors(corsOptions));
+
 // CORS configuration
 const corsOptions = {
     origin: isProduction ? process.env.FRONTEND_URL : 'http://localhost:3000',
